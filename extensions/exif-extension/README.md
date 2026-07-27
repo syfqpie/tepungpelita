@@ -1,0 +1,1 @@
+# @koci/directus-exif-extension
