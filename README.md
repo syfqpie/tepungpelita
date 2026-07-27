@@ -22,38 +22,44 @@ Directus extensions.
 
 ## Prerequisites
 
-- Node >= 18
-- pnpm >= 9 (`corepack enable` will pick up the version pinned in `package.json`)
+- Node >= 22
+- pnpm >= 10 (`corepack enable` will pick up the version pinned in `package.json`)
 - Docker + Docker Compose
 
 
-### Development
+## Development
+
+### Getting started
+
+```bash
+./scripts/init-dev.sh # creates local dev directories, install dependencies, and installs Git hooks (if available)
+
+pnpm docker:up        # start development env
+```
 
 ### Git hooks
 
+If `pre-commit` is installed, `./scripts/init-dev.sh` automatically installs the required Git hooks.
+
+To install them manually:
+
 ```bash
-# install pre-commit if you don't have it
 pre-commit install --hook-type commit-msg
 ```
 
-## Getting started
-
-```bash
-pnpm install        # installs deps for every extension in one pass
-pnpm build           # builds every extension (pnpm -r --if-present build)
-pnpm docker:up        # starts Directus + sqlite via docker compose
-```
+### Development workflow
 
 Directus mounts `./extensions` directly, so anything built to
-`extensions/<name>/dist` is picked up on container (re)start:
+`extensions/<name>/dist` is picked up on container (re)start.
+
+After making changes to an extension:
 
 ```bash
 pnpm build
 pnpm docker:restart
 ```
 
-For active development, run the SDK's watch mode across all extensions in
-parallel and restart Directus as needed:
+For active development, run the SDK watch mode across all extensions in parallel and restart Directus as needed:
 
 ```bash
 pnpm dev
@@ -66,7 +72,7 @@ cd extensions
 pnpm dlx create-directus-extension@latest
 ```
 
-Name it `@koci/directus-<name>-extension` in the generated `package.json`
+Name it `@koci/<name>-extension` in the generated `package.json`
 (see `extensions/directus-exif-extension/package.json` for the convention),
 then from the repo root:
 

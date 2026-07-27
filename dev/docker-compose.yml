@@ -1,0 +1,25 @@
+services:
+  directus:
+    container_name: koci.dev.directus
+    image: directus/directus:12
+    ports:
+      - 8055:8055
+    volumes:
+      - ./database:/directus/database
+      - ./uploads:/directus/uploads
+      - ../extensions:/directus/extensions
+    env_file:
+      - .env
+    environment:
+      EXTENSIONS_AUTO_RELOAD: true
+    #   DB_CLIENT: "sqlite3"
+    #   DB_FILENAME: "/directus/database/data.db"
+    #   WEBSOCKETS_ENABLED: "true"
+    #   PUBLIC_URL: "http://localhost:8055/"
+    #   LICENSE_KEY: ""
+    networks:
+      - koci.dev.network
+
+networks:
+  koci.dev.network:
+    driver: bridge
