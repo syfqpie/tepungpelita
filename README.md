@@ -33,7 +33,7 @@ Directus extensions.
 
 ```bash
 # install pre-commit if you don't have it
-$ pre-commit install --hook-type commit-msg
+pre-commit install --hook-type commit-msg
 ```
 
 ## Getting started
