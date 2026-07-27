@@ -1,0 +1,16 @@
+# Mac/OSX
+**/.DS_Store
+
+# Windows
+**/Thumbs.db
+
+**/node_modules
+.turbo
+.koci
+**/dist
+
+# env files
+.env*
+
+# but keep the example file
+!.env.example
