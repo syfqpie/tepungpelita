@@ -1,0 +1,49 @@
+{
+	"name": "@koci/directus-exif-extension",
+	"description": "Import files with EXIF metadata and manage them in Directus.",
+	"icon": "extension",
+	"version": "1.0.0",
+	"keywords": [
+		"directus",
+		"directus-extension",
+		"directus-extension-bundle"
+	],
+	"type": "module",
+	"files": [
+		"dist"
+	],
+	"directus:extension": {
+		"type": "bundle",
+		"path": {
+			"app": "dist/app.js",
+			"api": "dist/api.js"
+		},
+		"entries": [
+			{
+				"type": "hook",
+				"name": "schema-bootstrap",
+				"source": "src/hooks/schema-bootstrap/index.ts"
+			},
+			{
+				"type": "hook",
+				"name": "exif-import",
+				"source": "src/hooks/exif-import/index.ts"
+			}
+		],
+		"host": "^10.10.0"
+	},
+	"scripts": {
+		"build": "directus-extension build",
+		"dev": "directus-extension build -w --no-minify",
+		"link": "directus-extension link",
+		"validate": "directus-extension validate",
+		"add": "directus-extension add"
+	},
+	"devDependencies": {
+		"@directus/extensions-sdk": "18.0.1",
+		"@directus/types": "^16.0.0"
+	},
+	"dependencies": {
+		"exifr": "^7.1.3"
+	}
+}
