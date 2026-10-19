@@ -1,6 +1,10 @@
 import type { ApiExtensionContext } from '@directus/types'
 import { COLLECTION, collectionMeta, relationDefinition } from '../schemas/exif-metadata'
 
+/**
+ * Creates the `exif_metadata` collection and its relation to `directus_files`
+ * if they don't exist yet. Safe to call on every boot; errors are logged, not thrown.
+ */
 export const ensureCollectionExists = async (context: ApiExtensionContext): Promise<void> => {
 	const { services, getSchema, logger } = context
 

@@ -1,9 +1,11 @@
-import { defineHook } from '@directus/extensions-sdk'
-import exifr from 'exifr'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
-import { ensureCollectionExists } from './ensure-collection'
-import { COLLECTION } from './collection-schema'
+import { defineHook } from '@directus/extensions-sdk'
+import exifr from 'exifr'
+
+import { getLocalStorageRoot, toExifRecord } from './helpers'
+import { ensureCollectionExists } from './services'
+import { COLLECTION } from './schemas/exif-metadata'
 
 export default defineHook((hookEvents, context) => {
 	const { action, init } = hookEvents
@@ -11,6 +13,10 @@ export default defineHook((hookEvents, context) => {
 
 	init('app.after', () => ensureCollectionExists(context))
 
+	/**
+	 * Reads each uploaded image from local storage, extracts its EXIF data and
+	 * upserts one `exif_metadata` row per file. Skips non-images and files without EXIF.
+	 */
 	action('files.upload', async ({ key, collection }) => {
 		if (collection !== 'directus_files') return
 
@@ -25,7 +31,14 @@ export default defineHook((hookEvents, context) => {
 
 			if (!file.type?.startsWith('image/')) return
 
-			const root = env['STORAGE_LOCAL_ROOT'] ?? './uploads'
+			// Only the local storage driver is supported; the file is read straight from disk.
+			const root = getLocalStorageRoot(env, String(file.storage))
+
+			if (root === null) {
+				logger.warn(`[exif-extension] storage "${file.storage}" is not a local driver, skipping file ${key}`)
+				return
+			}
+
 			const filePath = path.resolve(root, file.filename_disk)
 			const buffer = await readFile(filePath)
 
@@ -46,22 +59,7 @@ export default defineHook((hookEvents, context) => {
 				return
 			}
 
-			const record: Record<string, any> = {
-				file: key,
-				camera_make: exifData.Make ?? null,
-				camera_model: exifData.Model ?? null,
-				lens_model: exifData.LensModel ?? null,
-				date_taken: exifData.DateTimeOriginal ?? exifData.CreateDate ?? null,
-				orientation: exifData.Orientation ?? null,
-				iso: exifData.ISO ?? null,
-				focal_length: exifData.FocalLength ?? null,
-				aperture: exifData.FNumber ?? null,
-				exposure_time: exifData.ExposureTime ?? null,
-				gps_latitude: exifData.latitude ?? null,
-				gps_longitude: exifData.longitude ?? null,
-				gps_altitude: exifData.GPSAltitude ?? null,
-				raw: exifData,
-			}
+			const record = toExifRecord(key, exifData)
 
 			const existing = await exifService.readByQuery({
 				filter: { file: { _eq: key } },

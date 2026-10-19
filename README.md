@@ -1,68 +1,95 @@
-# @koci
+<p align="center">
+  <img src="./koci-logo.svg" alt="Koci logo" width="160" />
+</p>
 
-Directus extensions.
+<h1 align="center">@koci</h1>
 
-## Structure
+<p align="center">
+  A monorepo of <a href="https://directus.io">Directus</a> extensions.
+</p>
 
-```
-.
-├── dev
-│   └── directus
-│       ├── database/               # sqlite data (gitignored)
-│       └── uploads/                # local file storage (gitignored)
-├── extensions
-│   ├── exif-extension
-│   │   └── ...
-│   └── ...                         # future @koci/* extensions land here
-├── package.json                    # root — shared tooling only
-├── pnpm-workspace.yaml
-└── README.md
-```
+## Extensions
 
+| Package                                                        | Type | Purpose                                                                                    |
+| -------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------ |
+| [`@koci/directus-exif-extension`](./extensions/exif-extension) | hook | Parses EXIF metadata from uploaded images and stores it in the `exif_metadata` collection. |
 
 ## Prerequisites
 
 - Node >= 22
-- pnpm >= 10 (`corepack enable` will pick up the version pinned in `package.json`)
+- pnpm >= 12 (`corepack enable` picks up the version pinned in `package.json`)
 - Docker + Docker Compose
 
+## Getting started
+
+```bash
+./scripts/init-dev.sh   # creates local dev directories, installs dependencies and Git hooks (if available)
+pnpm docker:up          # start Directus at http://localhost:8055
+```
+
+Copy `dev/.env.example` to `dev/.env` and fill in the admin credentials before the first start.
 
 ## Development
 
-### Getting started
+Directus mounts `./extensions` directly, so anything built to `extensions/<name>/dist` is picked up when the container restarts.
 
-```bash
-./scripts/init-dev.sh # creates local dev directories, install dependencies, and installs Git hooks (if available)
+| Command               | Description                                 |
+| --------------------- | ------------------------------------------- |
+| `pnpm build`          | Build all extensions                        |
+| `pnpm dev`            | Watch-build all extensions in parallel      |
+| `pnpm validate`       | Validate all extensions                     |
+| `pnpm test`           | Run unit tests (Vitest)                             |
+| `pnpm docker:up`      | Start the dev environment                   |
+| `pnpm docker:down`    | Stop the dev environment                    |
+| `pnpm docker:restart` | Restart Directus to load rebuilt extensions |
+| `pnpm docker:logs`    | Follow Directus logs                        |
 
-pnpm docker:up        # start development env
-```
-
-### Git hooks
-
-If `pre-commit` is installed, `./scripts/init-dev.sh` automatically installs the required Git hooks.
-
-To install them manually:
-
-```bash
-pre-commit install --hook-type commit-msg
-```
-
-### Development workflow
-
-Directus mounts `./extensions` directly, so anything built to
-`extensions/<name>/dist` is picked up on container (re)start.
-
-After making changes to an extension:
+Typical loop:
 
 ```bash
 pnpm build
 pnpm docker:restart
 ```
 
-For active development, run the SDK watch mode across all extensions in parallel and restart Directus as needed:
+### Resetting the dev environment
 
 ```bash
-pnpm dev
+pnpm docker:down
+rm -rf dev/database/*   # wipes the sqlite DB (collections, users, settings)
+pnpm docker:up
+```
+
+Uploaded files live in `dev/uploads`.
+
+### Git hooks
+
+Commits must follow [Conventional Commits](https://www.conventionalcommits.org). If `pre-commit` is installed, `./scripts/init-dev.sh` sets up the hook. To install it manually:
+
+```bash
+pre-commit install --hook-type commit-msg
+```
+
+## Project structure
+
+```
+.
+├── dev/                    # local Directus (docker-compose, .env, sqlite, uploads)
+├── extensions/
+│   └── exif-extension/     # @koci/directus-exif-extension
+├── scripts/                # dev setup scripts
+├── koci-logo.svg
+├── package.json            # root: shared tooling only
+└── pnpm-workspace.yaml
+```
+
+## Releasing
+
+Versioning and publishing use [Changesets](https://github.com/changesets/changesets):
+
+```bash
+pnpm changeset   # describe the change and pick a bump; commit the generated file
+pnpm version-packages   # apply pending changesets (bumps versions, updates changelogs)
+pnpm release     # build and publish to npm (requires `npm login` and the @koci org)
 ```
 
 ## Adding a new extension
@@ -72,32 +99,16 @@ cd extensions
 pnpm dlx create-directus-extension@latest
 ```
 
-Name it `@koci/<name>-extension` in the generated `package.json`
-(see `extensions/directus-exif-extension/package.json` for the convention),
-then from the repo root:
+Name it `@koci/directus-<feature>-extension` in the generated `package.json`, then from the repo root:
 
 ```bash
 pnpm install   # links it into the workspace
 ```
 
-No changes to `pnpm-workspace.yaml` are needed — it already globs
-`extensions/*`.
+No changes to `pnpm-workspace.yaml` are needed; it already globs `extensions/*`.
 
 ## Conventions
 
-- **Naming**: package name `@koci/directus-<feature>-extension`, folder name
-  matches the unscoped part (`directus-<feature>-extension`) so paths stay
-  predictable under `extensions/`.
-- **Shared TS config**: extend `tsconfig.base.json` from the repo root rather
-  than duplicating compiler options per extension.
-- **Extension-local deps**: runtime dependencies (e.g. `exifr`) belong in the
-  extension's own `package.json`, not the root — the root only holds tooling
-  shared by every extension (`@directus/extensions-sdk`, `typescript`).
-- **Lockfile**: single `pnpm-lock.yaml` at the repo root. Extensions should
-  not carry their own lockfiles.
-
-## Extensions in this repo
-
-| Package | Type | Purpose |
-|---|---|---|
-| [`@koci/directus-exif-extension`](./extensions/directus-exif-extension) | hook | Parses EXIF metadata from uploaded images and stores it on `directus_files`. |
+- **Naming**: package name `@koci/directus-<feature>-extension`. Folders under `extensions/` are named `<feature>-extension`.
+- **Dependencies**: runtime dependencies (e.g. `exifr`) belong in the extension's own `package.json`. The root only holds shared tooling.
+- **Lockfile**: a single `pnpm-lock.yaml` at the repo root. Extensions don't carry their own.
