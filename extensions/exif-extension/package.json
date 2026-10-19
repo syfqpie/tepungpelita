@@ -1,7 +1,7 @@
 {
 	"name": "@tepungpelita/directus-exif-extension",
 	"description": "Import files with EXIF metadata and manage them in Directus.",
-	"icon": "extension",
+	"icon": "camera",
 	"version": "0.1.0",
 	"license": "MIT",
 	"author": "syfqpie",
@@ -42,7 +42,7 @@
 				"source": "src/hooks/exif-import/index.ts"
 			}
 		],
-		"host": "^10.10.0"
+		"host": ">=10.10.0"
 	},
 	"scripts": {
 		"build": "directus-extension build",

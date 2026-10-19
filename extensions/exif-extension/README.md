@@ -31,9 +31,19 @@ Non-image files and images without EXIF data are skipped. Errors are logged and 
 
 The collection is created automatically by the hook on startup; no migration is needed.
 
+## Installation
+
+Search for **Directus Exif Extension** in the Directus Marketplace (Settings → Marketplace), or install from npm:
+
+```bash
+npm install @tepungpelita/directus-exif-extension
+```
+
+This hook reads files from disk and uses Directus services, so it is not a sandboxed extension. On self-hosted instances, set `MARKETPLACE_TRUST=all` (or trust this package) to install it from the Marketplace.
+
 ## Requirements
 
-- Directus `^10.10.0`
+- Directus `>=10.10.0`
 - Files stored on the **local** storage driver (the default). The hook reads the file from the location's `STORAGE_<LOCATION>_ROOT` (default `./uploads`); files on other drivers are skipped with a warning.
 
 ## Development
