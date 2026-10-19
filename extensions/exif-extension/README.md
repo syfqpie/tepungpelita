@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/syfqpie/pelita/main/tepungpelita-logo.svg" alt="Pelita logo" width="120" />
+  <img src="https://raw.githubusercontent.com/syfqpie/tepungpelita/main/tepungpelita-logo.svg" alt="Pelita logo" width="120" />
 </p>
 
 <h1 align="center">@tepungpelita/directus-exif-extension</h1>
