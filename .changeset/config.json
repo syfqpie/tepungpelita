@@ -6,7 +6,7 @@
   "changelog": [
     "@changesets/changelog-github",
     {
-      "repo": "syfqpie/koci"
+      "repo": "syfqpie/tepungpelita"
     }
   ],
   "commit": true,

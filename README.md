@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="./koci-logo.svg" alt="Koci logo" width="160" />
+  <img src="./tepungpelita-logo.svg" alt="Pelita logo" width="160" />
 </p>
 
-<h1 align="center">@koci</h1>
+<h1 align="center">@tepungpelita</h1>
 
 <p align="center">
   A monorepo of <a href="https://directus.io">Directus</a> extensions.
@@ -12,7 +12,7 @@
 
 | Package                                                        | Type | Purpose                                                                                    |
 | -------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------ |
-| [`@koci/directus-exif-extension`](./extensions/exif-extension) | hook | Parses EXIF metadata from uploaded images and stores it in the `exif_metadata` collection. |
+| [`@tepungpelita/directus-exif-extension`](./extensions/exif-extension) | hook | Parses EXIF metadata from uploaded images and stores it in the `exif_metadata` collection. |
 
 ## Prerequisites
 
@@ -75,9 +75,9 @@ pre-commit install --hook-type commit-msg
 .
 ├── dev/                    # local Directus (docker-compose, .env, sqlite, uploads)
 ├── extensions/
-│   └── exif-extension/     # @koci/directus-exif-extension
+│   └── exif-extension/     # @tepungpelita/directus-exif-extension
 ├── scripts/                # dev setup scripts
-├── koci-logo.svg
+├── tepungpelita-logo.svg
 ├── package.json            # root: shared tooling only
 └── pnpm-workspace.yaml
 ```
@@ -89,7 +89,7 @@ Versioning and publishing use [Changesets](https://github.com/changesets/changes
 ```bash
 pnpm changeset   # describe the change and pick a bump; commit the generated file
 pnpm version-packages   # apply pending changesets (bumps versions, updates changelogs)
-pnpm release     # build and publish to npm (requires `npm login` and the @koci org)
+pnpm release     # build and publish to npm (requires `npm login` and the @tepungpelita org)
 ```
 
 ## Adding a new extension
@@ -99,7 +99,7 @@ cd extensions
 pnpm dlx create-directus-extension@latest
 ```
 
-Name it `@koci/directus-<feature>-extension` in the generated `package.json`, then from the repo root:
+Name it `@tepungpelita/directus-<feature>-extension` in the generated `package.json`, then from the repo root:
 
 ```bash
 pnpm install   # links it into the workspace
@@ -109,6 +109,6 @@ No changes to `pnpm-workspace.yaml` are needed; it already globs `extensions/*`.
 
 ## Conventions
 
-- **Naming**: package name `@koci/directus-<feature>-extension`. Folders under `extensions/` are named `<feature>-extension`.
+- **Naming**: package name `@tepungpelita/directus-<feature>-extension`. Folders under `extensions/` are named `<feature>-extension`.
 - **Dependencies**: runtime dependencies (e.g. `exifr`) belong in the extension's own `package.json`. The root only holds shared tooling.
 - **Lockfile**: a single `pnpm-lock.yaml` at the repo root. Extensions don't carry their own.

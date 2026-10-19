@@ -1,7 +1,7 @@
 {
-  "name": "koci",
+  "name": "tepungpelita",
   "version": "0.0.0",
-  "description": "Koci (@koci/*) - directus extensions monorepo",
+  "description": "Tepung Pelita (@tepungpelita/*) - directus extensions monorepo",
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",

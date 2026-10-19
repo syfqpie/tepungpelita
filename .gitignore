@@ -6,7 +6,7 @@
 
 **/node_modules
 .turbo
-.koci
+.pelita
 **/dist
 
 # env files
