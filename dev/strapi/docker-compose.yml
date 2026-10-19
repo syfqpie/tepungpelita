@@ -14,6 +14,11 @@ services:
       - ./.env:/opt/app/.env # Strapi reads .env via dotenv in development
       - ./public/uploads:/opt/app/public/uploads
       - ./database:/opt/app/.tmp # SQLite file lives here (data.db)
+      # Local plugin: only the built output is mounted, since the pnpm node_modules symlinks don't resolve in the container.
+      # Build it first with `pnpm build`.
+      - ../../plugins/strapi-exif-plugin/package.json:/opt/app/plugins/strapi-exif-plugin/package.json:ro
+      - ../../plugins/strapi-exif-plugin/strapi-server.js:/opt/app/plugins/strapi-exif-plugin/strapi-server.js:ro
+      - ../../plugins/strapi-exif-plugin/dist:/opt/app/plugins/strapi-exif-plugin/dist:ro
     ports:
       - 1337:1337
     networks:

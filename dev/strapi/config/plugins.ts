@@ -24,6 +24,10 @@ const deniedTypes = [
 ];
 
 const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Plugin => ({
+  exif: {
+    enabled: true,
+    resolve: './plugins/strapi-exif-plugin',
+  },
   'users-permissions': {
     config: {
       jwtManagement: 'refresh',

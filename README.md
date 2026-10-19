@@ -8,11 +8,12 @@
   A monorepo of extensions and plugins for headless CMSes, starting with <a href="https://directus.io">Directus</a>.
 </p>
 
-## Extensions
+## Packages
 
-| Package                                                        | Type | Purpose                                                                                    |
-| -------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------ |
-| [`@tepungpelita/directus-exif-extension`](./extensions/exif-extension) | hook | Parses EXIF metadata from uploaded images and stores it in the `exif_metadata` collection. |
+| Package                                                                | Platform | Purpose                                                                                    |
+| ---------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------ |
+| [`@tepungpelita/directus-exif-extension`](./extensions/exif-extension) | Directus | Parses EXIF metadata from uploaded images and stores it in the `exif_metadata` collection. |
+| [`@tepungpelita/strapi-exif-plugin`](./plugins/strapi-exif-plugin)     | Strapi   | Parses EXIF metadata from uploaded images and stores it in the `exif-metadata` collection. |
 
 ## Prerequisites
 
@@ -34,22 +35,22 @@ Copy `dev/directus/.env.example` to `dev/directus/.env` and fill in the admin cr
 
 Directus mounts `./extensions` directly, so anything built to `extensions/<name>/dist` is picked up when the container restarts.
 
-| Command                        | Description                                  |
-| ------------------------------ | -------------------------------------------- |
-| `pnpm build`                   | Build all extensions                         |
-| `pnpm dev`                     | Watch-build all extensions in parallel       |
-| `pnpm validate`                | Validate all extensions                      |
-| `pnpm test`                    | Run unit tests (Vitest)                      |
-| `pnpm docker:up:directus`      | Start the Directus dev environment           |
-| `pnpm docker:down:directus`    | Stop the Directus dev environment            |
-| `pnpm docker:restart:directus` | Restart Directus to load rebuilt extensions  |
-| `pnpm docker:logs:directus`    | Follow Directus logs                         |
-| `pnpm docker:up:strapi`        | Start the Strapi dev environment             |
-| `pnpm docker:down:strapi`      | Stop the Strapi dev environment              |
-| `pnpm docker:restart:strapi`   | Restart Strapi                               |
-| `pnpm docker:logs:strapi`      | Follow Strapi logs                           |
+| Command                        | Description                                 |
+| ------------------------------ | ------------------------------------------- |
+| `pnpm build`                   | Build all extensions                        |
+| `pnpm dev`                     | Watch-build all extensions in parallel      |
+| `pnpm validate`                | Validate all extensions                     |
+| `pnpm test`                    | Run unit tests (Vitest)                     |
+| `pnpm docker:up:directus`      | Start the Directus dev environment          |
+| `pnpm docker:down:directus`    | Stop the Directus dev environment           |
+| `pnpm docker:restart:directus` | Restart Directus to load rebuilt extensions |
+| `pnpm docker:logs:directus`    | Follow Directus logs                        |
+| `pnpm docker:up:strapi`        | Start the Strapi dev environment            |
+| `pnpm docker:down:strapi`      | Stop the Strapi dev environment             |
+| `pnpm docker:restart:strapi`   | Restart Strapi                              |
+| `pnpm docker:logs:strapi`      | Follow Strapi logs                          |
 
-`dev/strapi` is a standalone npm app run only in Docker (it has its own `package-lock.json`). It is not part of the pnpm workspace, so `pnpm build` and CI don't touch it.
+`dev/strapi` is a standalone npm app run only in Docker (it has its own `package-lock.json`). It is not part of the pnpm workspace. It loads the built plugin from `plugins/strapi-exif-plugin/dist`, so run `pnpm build` before `pnpm docker:up:strapi`, and again after plugin changes (then `pnpm docker:restart:strapi`).
 
 Typical loop:
 
@@ -85,6 +86,8 @@ pre-commit install --hook-type commit-msg
 │   └── strapi/             # local Strapi app (Docker, npm, standalone)
 ├── extensions/
 │   └── exif-extension/     # @tepungpelita/directus-exif-extension
+├── plugins/
+│   └── strapi-exif-plugin/ # @tepungpelita/strapi-exif-plugin
 ├── scripts/                # dev setup scripts
 ├── tepungpelita-logo.svg
 ├── package.json            # root: shared tooling only
