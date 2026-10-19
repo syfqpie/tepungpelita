@@ -18,6 +18,9 @@
     },
     "validate": {
       "dependsOn": ["^validate"]
+    },
+    "test": {
+      "dependsOn": ["^build"]
     }
   }
 }

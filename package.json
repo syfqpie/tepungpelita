@@ -7,8 +7,9 @@
     "build": "turbo run build",
     "link": "turbo run link",
     "validate": "turbo run validate",
+    "test": "turbo run test",
     "changeset": "changeset",
-    "version": "changeset version",
+    "version-packages": "changeset version",
     "release": "turbo run build && changeset publish",
     "docker:up": "docker compose -f ./dev/docker-compose.yml up -d",
     "docker:down": "docker compose -f ./dev/docker-compose.yml down",
@@ -16,11 +17,12 @@
     "docker:logs": "docker compose -f ./dev/docker-compose.yml logs -f directus"
   },
   "devDependencies": {
-    "@changesets/cli": "^3.0.0",
-    "@types/node": "^26.1.1",
-    "eslint": "^9.39.5",
-    "turbo": "^2.10.6",
-    "typescript": "^5.9.3"
+    "@changesets/changelog-github": "^1.0.1",
+    "@changesets/cli": "^3.0.3",
+    "@types/node": "^26.6.5",
+    "eslint": "^10.13.0",
+    "turbo": "^2.11.9",
+    "typescript": "^7.0.2"
   },
-  "packageManager": "pnpm@12.13.0+sha512.1e55719bf26e809dce5c5084fdebaa64efb3da9038ae5d68a9f8a68311f1a45841c8c3b76a37298c3b66f6bcc80409a9b7f33c78a7168a3e90fb65a5d8235ae4"
+  "packageManager": "pnpm@12.14.0+sha512.c18ba6d87993d3d164cb5e8948f32b2c06ee854487e06cd8d86781342fb3e5bb4634367034711e86802baa9c37bea906ce1929ad08d70884c97d801df13389a6"
 }
