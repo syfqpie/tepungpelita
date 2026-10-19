@@ -5,7 +5,7 @@
 <h1 align="center">@tepungpelita</h1>
 
 <p align="center">
-  A monorepo of <a href="https://directus.io">Directus</a> extensions.
+  A monorepo of extensions and plugins for headless CMSes, starting with <a href="https://directus.io">Directus</a>.
 </p>
 
 ## Extensions
@@ -24,42 +24,42 @@
 
 ```bash
 ./scripts/init-dev.sh   # creates local dev directories, installs dependencies and Git hooks (if available)
-pnpm docker:up          # start Directus at http://localhost:8055
+pnpm docker:up:directus # start Directus at http://localhost:8055
 ```
 
-Copy `dev/.env.example` to `dev/.env` and fill in the admin credentials before the first start.
+Copy `dev/directus/.env.example` to `dev/directus/.env` and fill in the admin credentials before the first start.
 
 ## Development
 
 Directus mounts `./extensions` directly, so anything built to `extensions/<name>/dist` is picked up when the container restarts.
 
-| Command               | Description                                 |
-| --------------------- | ------------------------------------------- |
-| `pnpm build`          | Build all extensions                        |
-| `pnpm dev`            | Watch-build all extensions in parallel      |
-| `pnpm validate`       | Validate all extensions                     |
-| `pnpm test`           | Run unit tests (Vitest)                             |
-| `pnpm docker:up`      | Start the dev environment                   |
-| `pnpm docker:down`    | Stop the dev environment                    |
-| `pnpm docker:restart` | Restart Directus to load rebuilt extensions |
-| `pnpm docker:logs`    | Follow Directus logs                        |
+| Command                        | Description                                  |
+| ------------------------------ | -------------------------------------------- |
+| `pnpm build`                   | Build all extensions                         |
+| `pnpm dev`                     | Watch-build all extensions in parallel       |
+| `pnpm validate`                | Validate all extensions                      |
+| `pnpm test`                    | Run unit tests (Vitest)                      |
+| `pnpm docker:up:directus`      | Start the Directus dev environment           |
+| `pnpm docker:down:directus`    | Stop the Directus dev environment            |
+| `pnpm docker:restart:directus` | Restart Directus to load rebuilt extensions  |
+| `pnpm docker:logs:directus`    | Follow Directus logs                         |
 
 Typical loop:
 
 ```bash
 pnpm build
-pnpm docker:restart
+pnpm docker:restart:directus
 ```
 
 ### Resetting the dev environment
 
 ```bash
-pnpm docker:down
-rm -rf dev/database/*   # wipes the sqlite DB (collections, users, settings)
-pnpm docker:up
+pnpm docker:down:directus
+rm -rf dev/directus/database/*   # wipes the sqlite DB (collections, users, settings)
+pnpm docker:up:directus
 ```
 
-Uploaded files live in `dev/uploads`.
+Uploaded files live in `dev/directus/uploads`.
 
 ### Git hooks
 
@@ -73,7 +73,8 @@ pre-commit install --hook-type commit-msg
 
 ```
 .
-├── dev/                    # local Directus (docker-compose, .env, sqlite, uploads)
+├── dev/
+│   └── directus/           # local Directus (docker-compose, .env, sqlite, uploads)
 ├── extensions/
 │   └── exif-extension/     # @tepungpelita/directus-exif-extension
 ├── scripts/                # dev setup scripts
@@ -84,13 +85,11 @@ pre-commit install --hook-type commit-msg
 
 ## Releasing
 
-Versioning and publishing use [Changesets](https://github.com/changesets/changesets):
+Versioning and publishing use [Changesets](https://github.com/changesets/changesets) and run in CI, so you don't publish by hand:
 
-```bash
-pnpm changeset   # describe the change and pick a bump; commit the generated file
-pnpm version-packages   # apply pending changesets (bumps versions, updates changelogs)
-pnpm release     # build and publish to npm (requires `npm login` and the @tepungpelita org)
-```
+1. Run `pnpm changeset` and commit the generated file with your change. PRs that change a package without a changeset fail CI.
+2. When the PR is merged to `main`, the Release workflow opens (or updates) a "chore: version packages" PR.
+3. Merging that PR publishes to npm through [trusted publishing](https://docs.npmjs.com/trusted-publishers) (OIDC), with no `NPM_TOKEN`. Each package needs a trusted publisher entry on npm (repo `syfqpie/tepungpelita`, workflow `release.yml`), and a brand-new package needs one manual first publish.
 
 ## Adding a new extension
 

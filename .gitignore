@@ -15,5 +15,5 @@
 # but keep the example file
 !.env.example
 
-dev/database
-dev/uploads
+dev/*/database
+dev/*/uploads

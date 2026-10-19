@@ -81,7 +81,7 @@ From the repo root:
 
 ```bash
 pnpm --filter @tepungpelita/directus-exif-extension build   # or: pnpm build
-pnpm docker:restart
+pnpm docker:restart:directus
 ```
 
 Upload a JPEG with EXIF data in the Directus file library, then check the `exif_metadata` collection.

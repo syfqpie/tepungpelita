@@ -11,10 +11,10 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "turbo run build && changeset publish",
-    "docker:up": "docker compose -f ./dev/docker-compose.yml up -d",
-    "docker:down": "docker compose -f ./dev/docker-compose.yml down",
-    "docker:restart": "docker compose -f ./dev/docker-compose.yml --env-file ./dev/.env restart",
-    "docker:logs": "docker compose -f ./dev/docker-compose.yml logs -f directus"
+    "docker:up:directus": "docker compose -f ./dev/directus/docker-compose.yml up -d",
+    "docker:down:directus": "docker compose -f ./dev/directus/docker-compose.yml down",
+    "docker:restart:directus": "docker compose -f ./dev/directus/docker-compose.yml --env-file ./dev/directus/.env restart",
+    "docker:logs:directus": "docker compose -f ./dev/directus/docker-compose.yml logs -f directus"
   },
   "devDependencies": {
     "@changesets/changelog-github": "^1.0.1",
