@@ -1,7 +1,7 @@
 {
   "name": "tepungpelita",
   "version": "0.0.0",
-  "description": "Tepung Pelita (@tepungpelita/*) - directus extensions monorepo",
+  "description": "Tepung Pelita (@tepungpelita/*) - Directus extensions and Strapi plugins monorepo",
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",

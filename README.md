@@ -25,9 +25,10 @@
 ```bash
 ./scripts/init-dev.sh   # creates local dev directories, installs dependencies and Git hooks (if available)
 pnpm docker:up:directus # start Directus at http://localhost:8055
+pnpm docker:up:strapi   # start Strapi at http://localhost:1337 (optional)
 ```
 
-Copy `dev/directus/.env.example` to `dev/directus/.env` and fill in the admin credentials before the first start.
+Copy `dev/directus/.env.example` to `dev/directus/.env` and fill in the admin credentials before the first start. `init-dev.sh` also creates `dev/strapi/.env` with generated secrets.
 
 ## Development
 
@@ -43,6 +44,12 @@ Directus mounts `./extensions` directly, so anything built to `extensions/<name>
 | `pnpm docker:down:directus`    | Stop the Directus dev environment            |
 | `pnpm docker:restart:directus` | Restart Directus to load rebuilt extensions  |
 | `pnpm docker:logs:directus`    | Follow Directus logs                         |
+| `pnpm docker:up:strapi`        | Start the Strapi dev environment             |
+| `pnpm docker:down:strapi`      | Stop the Strapi dev environment              |
+| `pnpm docker:restart:strapi`   | Restart Strapi                               |
+| `pnpm docker:logs:strapi`      | Follow Strapi logs                           |
+
+`dev/strapi` is a standalone npm app run only in Docker (it has its own `package-lock.json`). It is not part of the pnpm workspace, so `pnpm build` and CI don't touch it.
 
 Typical loop:
 
@@ -74,7 +81,8 @@ pre-commit install --hook-type commit-msg
 ```
 .
 ├── dev/
-│   └── directus/           # local Directus (docker-compose, .env, sqlite, uploads)
+│   ├── directus/           # local Directus (docker-compose, .env, sqlite, uploads)
+│   └── strapi/             # local Strapi app (Docker, npm, standalone)
 ├── extensions/
 │   └── exif-extension/     # @tepungpelita/directus-exif-extension
 ├── scripts/                # dev setup scripts

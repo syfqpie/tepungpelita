@@ -23,6 +23,27 @@ else
   echo "    dev/directus/.env already exists, skipping"
 fi
 
+echo "==> Setting up dev/strapi/.env"
+STRAPI_DIR="$ROOT_DIR/dev/strapi"
+mkdir -p "$STRAPI_DIR/database" "$STRAPI_DIR/public/uploads"
+
+if [ ! -f "$STRAPI_DIR/.env" ]; then
+  cp "$STRAPI_DIR/.env.example" "$STRAPI_DIR/.env"
+  rand() { openssl rand -base64 16 2>/dev/null || head -c 16 /dev/urandom | base64; }
+  APP_KEYS="$(rand),$(rand),$(rand),$(rand)"
+  sed -i.bak \
+    -e "s|^APP_KEYS=.*|APP_KEYS=\"$APP_KEYS\"|" \
+    -e "s|^API_TOKEN_SALT=.*|API_TOKEN_SALT=$(rand)|" \
+    -e "s|^ADMIN_JWT_SECRET=.*|ADMIN_JWT_SECRET=$(rand)|" \
+    -e "s|^TRANSFER_TOKEN_SALT=.*|TRANSFER_TOKEN_SALT=$(rand)|" \
+    -e "s|^JWT_SECRET=.*|JWT_SECRET=$(rand)|" \
+    -e "s|^ENCRYPTION_KEY=.*|ENCRYPTION_KEY=$(rand)|" \
+    "$STRAPI_DIR/.env" && rm -f "$STRAPI_DIR/.env.bak"
+  echo "    Created dev/strapi/.env from dev/strapi/.env.example with generated secrets"
+else
+  echo "    dev/strapi/.env already exists, skipping"
+fi
+
 echo "==> Installing workspace dependencies"
 
 if command -v pnpm >/dev/null 2>&1; then
