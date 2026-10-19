@@ -3,8 +3,7 @@ import type { RawCollection } from "@directus/types"
 export const COLLECTION = 'exif_metadata'
 
 /**
- * Collection definition for `exif_metadata`. Keep field names in sync with
- * `extensions/migrations/20250727A-create-exif-metadata.js`.
+ * Collection definition for `exif_metadata`.
  */
 export const collectionMeta = {
 	collection: COLLECTION,

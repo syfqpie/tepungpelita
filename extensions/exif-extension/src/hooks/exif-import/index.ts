@@ -30,7 +30,15 @@ export default defineHook((hookEvents, context) => {
 
 			if (!file.type?.startsWith('image/')) return
 
-			const root = env['STORAGE_LOCAL_ROOT'] ?? './uploads'
+			// Only the local storage driver is supported; the file is read straight from disk.
+			const location = String(file.storage).toUpperCase()
+
+			if (env[`STORAGE_${location}_DRIVER`] !== 'local') {
+				logger.warn(`[exif-extension] storage "${file.storage}" is not a local driver, skipping file ${key}`)
+				return
+			}
+
+			const root = env[`STORAGE_${location}_ROOT`] ?? './uploads'
 			const filePath = path.resolve(root, file.filename_disk)
 			const buffer = await readFile(filePath)
 
