@@ -40,6 +40,7 @@
 	"scripts": {
 		"build": "strapi-plugin build",
 		"dev": "strapi-plugin watch",
+		"test": "vitest run",
 		"verify": "strapi-plugin verify"
 	},
 	"dependencies": {
@@ -47,7 +48,8 @@
 	},
 	"devDependencies": {
 		"@strapi/sdk-plugin": "^6.1.1",
-		"@strapi/strapi": "^5.58.0"
+		"@strapi/strapi": "^5.58.0",
+		"vitest": "^5.0.5"
 	},
 	"peerDependencies": {
 		"@strapi/strapi": "^5.0.0"
