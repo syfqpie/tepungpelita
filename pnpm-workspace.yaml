@@ -1,5 +1,9 @@
 packages:
+  - "dev/strapi"
   - "extensions/*"
 allowBuilds:
+  '@swc/core': true
+  better-sqlite3: true
+  core-js-pure: true
   esbuild: true
   vue-demi: true

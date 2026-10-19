@@ -14,7 +14,11 @@
     "docker:up:directus": "docker compose -f ./dev/directus/docker-compose.yml up -d",
     "docker:down:directus": "docker compose -f ./dev/directus/docker-compose.yml down",
     "docker:restart:directus": "docker compose -f ./dev/directus/docker-compose.yml --env-file ./dev/directus/.env restart",
-    "docker:logs:directus": "docker compose -f ./dev/directus/docker-compose.yml logs -f directus"
+    "docker:logs:directus": "docker compose -f ./dev/directus/docker-compose.yml logs -f directus",
+    "docker:up:strapi": "docker compose -f ./dev/strapi/docker-compose.yml up -d",
+    "docker:down:strapi": "docker compose -f ./dev/strapi/docker-compose.yml down",
+    "docker:restart:strapi": "docker compose -f ./dev/strapi/docker-compose.yml --env-file ./dev/strapi/.env restart",
+    "docker:logs:strapi": "docker compose -f ./dev/strapi/docker-compose.yml logs -f strapi"
   },
   "devDependencies": {
     "@changesets/changelog-github": "^1.0.1",

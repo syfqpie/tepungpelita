@@ -1,0 +1,24 @@
+services:
+  strapi:
+    container_name: tepungpelita.dev.strapi
+    build: .
+    image: tepungpelita.dev.strapi:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./config:/opt/app/config
+      - ./src:/opt/app/src
+      - ./package.json:/opt/package.json
+      - ./package-lock.json:/opt/package-lock.json
+      - ./.env:/opt/app/.env # Strapi reads .env via dotenv in development
+      - ./public/uploads:/opt/app/public/uploads
+      - ./database:/opt/app/.tmp # SQLite file lives here (data.db)
+    ports:
+      - 1337:1337
+    networks:
+      - tepungpelita.dev.strapi.network
+
+networks:
+  tepungpelita.dev.strapi.network:
+    driver: bridge
