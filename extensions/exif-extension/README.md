@@ -31,6 +31,35 @@ Non-image files and images without EXIF data are skipped. Errors are logged and 
 
 The collection is created automatically by the hook on startup; no migration is needed.
 
+## Querying via the API
+
+`exif_metadata` is a regular collection, so use the standard items endpoints. The authenticated role needs read permission on `exif_metadata`.
+
+```bash
+# EXIF for one file
+curl -H "Authorization: Bearer $TOKEN" \
+  "$DIRECTUS_URL/items/exif_metadata?filter[file][_eq]=<file-id>&limit=1"
+
+# Photos taken with a given camera, newest first, with the related file info
+curl -H "Authorization: Bearer $TOKEN" \
+  "$DIRECTUS_URL/items/exif_metadata?filter[camera_make][_eq]=Canon&sort=-date_taken&fields=id,camera_model,date_taken,file.id,file.filename_download"
+
+# Only photos that have GPS coordinates
+curl -H "Authorization: Bearer $TOKEN" \
+  "$DIRECTUS_URL/items/exif_metadata?filter[gps_latitude][_nnull]=true&fields=file,gps_latitude,gps_longitude"
+```
+
+With the SDK:
+
+```ts
+import { createDirectus, rest, readItems } from '@directus/sdk'
+
+const client = createDirectus(DIRECTUS_URL).with(rest())
+const items = await client.request(
+  readItems('exif_metadata', { filter: { file: { _eq: fileId } }, limit: 1 }),
+)
+```
+
 ## Installation
 
 Search for **Directus Exif Extension** in the Directus Marketplace (Settings → Marketplace), or install from npm:
