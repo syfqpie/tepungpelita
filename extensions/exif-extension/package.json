@@ -1,18 +1,18 @@
 {
-	"name": "@koci/directus-exif-extension",
+	"name": "@tepungpelita/directus-exif-extension",
 	"description": "Import files with EXIF metadata and manage them in Directus.",
 	"icon": "extension",
 	"version": "0.0.0",
 	"license": "MIT",
 	"author": "syfqpie",
-	"homepage": "https://github.com/syfqpie/koci/tree/main/extensions/exif-extension#readme",
+	"homepage": "https://github.com/syfqpie/tepungpelita/tree/main/extensions/exif-extension#readme",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/syfqpie/koci.git",
+		"url": "git+https://github.com/syfqpie/tepungpelita.git",
 		"directory": "extensions/exif-extension"
 	},
 	"bugs": {
-		"url": "https://github.com/syfqpie/koci/issues"
+		"url": "https://github.com/syfqpie/tepungpelita/issues"
 	},
 	"publishConfig": {
 		"access": "public"

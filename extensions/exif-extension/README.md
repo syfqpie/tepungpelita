@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/syfqpie/koci/main/koci-logo.svg" alt="Koci logo" width="120" />
+  <img src="https://raw.githubusercontent.com/syfqpie/pelita/main/tepungpelita-logo.svg" alt="Pelita logo" width="120" />
 </p>
 
-<h1 align="center">@koci/directus-exif-extension</h1>
+<h1 align="center">@tepungpelita/directus-exif-extension</h1>
 
 Directus bundle extension that extracts EXIF metadata from uploaded images and stores it in an `exif_metadata` collection, linked one-to-one with `directus_files`.
 
@@ -41,7 +41,7 @@ The collection is created automatically by the hook on startup; no migration is 
 From the repo root:
 
 ```bash
-pnpm --filter @koci/directus-exif-extension build   # or: pnpm build
+pnpm --filter @tepungpelita/directus-exif-extension build   # or: pnpm build
 pnpm docker:restart
 ```
 

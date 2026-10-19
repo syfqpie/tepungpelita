@@ -1,6 +1,6 @@
 services:
   directus:
-    container_name: koci.dev.directus
+    container_name: tepungpelita.dev.directus
     image: directus/directus:12
     ports:
       - 8055:8055
@@ -13,8 +13,8 @@ services:
     environment:
       EXTENSIONS_AUTO_RELOAD: true
     networks:
-      - koci.dev.network
+      - tepungpelita.dev.network
 
 networks:
-  koci.dev.network:
+  tepungpelita.dev.network:
     driver: bridge
