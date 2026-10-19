@@ -1,9 +1,10 @@
-import { defineHook } from '@directus/extensions-sdk'
-import exifr from 'exifr'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
-import { ensureCollectionExists } from './ensure-collection'
-import { COLLECTION } from './collection-schema'
+import { defineHook } from '@directus/extensions-sdk'
+import exifr from 'exifr'
+
+import { ensureCollectionExists } from './services'
+import { COLLECTION } from './schemas/exif-metadata'
 
 export default defineHook((hookEvents, context) => {
 	const { action, init } = hookEvents
@@ -11,6 +12,10 @@ export default defineHook((hookEvents, context) => {
 
 	init('app.after', () => ensureCollectionExists(context))
 
+	/**
+	 * Reads each uploaded image from local storage, extracts its EXIF data and
+	 * upserts one `exif_metadata` row per file. Skips non-images and files without EXIF.
+	 */
 	action('files.upload', async ({ key, collection }) => {
 		if (collection !== 'directus_files') return
 

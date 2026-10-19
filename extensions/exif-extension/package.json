@@ -21,11 +21,6 @@
 		"entries": [
 			{
 				"type": "hook",
-				"name": "schema-bootstrap",
-				"source": "src/hooks/schema-bootstrap/index.ts"
-			},
-			{
-				"type": "hook",
 				"name": "exif-import",
 				"source": "src/hooks/exif-import/index.ts"
 			}

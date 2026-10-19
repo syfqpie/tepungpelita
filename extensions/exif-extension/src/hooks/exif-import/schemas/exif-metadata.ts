@@ -1,8 +1,12 @@
-import type { Collection, RawCollection, Relation } from "@directus/types"
+import type { RawCollection } from "@directus/types"
 
 export const COLLECTION = 'exif_metadata'
 
-export const collectionMeta: RawCollection = {
+/**
+ * Collection definition for `exif_metadata`. Keep field names in sync with
+ * `extensions/migrations/20250727A-create-exif-metadata.js`.
+ */
+export const collectionMeta = {
 	collection: COLLECTION,
 	meta: {
 		icon: 'photo_camera',
@@ -52,14 +56,15 @@ export const collectionMeta: RawCollection = {
 			meta: { special: ['date-created'], interface: 'datetime', readonly: true, width: 'half' },
 		},
 	],
-} as const
+} as RawCollection
 
-export const relationDefinition: Partial<Relation> = {
+/** One-to-one link from `exif_metadata.file` to `directus_files.id`; rows are deleted with their file. */
+export const relationDefinition = {
 	collection: COLLECTION,
 	field: 'file',
 	related_collection: 'directus_files',
 	schema: {
-    on_delete: 'CASCADE'
-  },
-	meta: { one_deselect_action: 'nullify' as const },
+		on_delete: 'CASCADE',
+	},
+	meta: { one_deselect_action: 'nullify' },
 }
