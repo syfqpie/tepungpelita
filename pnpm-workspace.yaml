@@ -1,5 +1,4 @@
 packages:
-  - "dev/strapi"
   - "extensions/*"
 allowBuilds:
   '@swc/core': true
