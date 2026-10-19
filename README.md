@@ -38,6 +38,7 @@ Directus mounts `./extensions` directly, so anything built to `extensions/<name>
 | `pnpm build`          | Build all extensions                        |
 | `pnpm dev`            | Watch-build all extensions in parallel      |
 | `pnpm validate`       | Validate all extensions                     |
+| `pnpm test`           | Run unit tests (Vitest)                             |
 | `pnpm docker:up`      | Start the dev environment                   |
 | `pnpm docker:down`    | Stop the dev environment                    |
 | `pnpm docker:restart` | Restart Directus to load rebuilt extensions |
@@ -87,7 +88,7 @@ Versioning and publishing use [Changesets](https://github.com/changesets/changes
 
 ```bash
 pnpm changeset   # describe the change and pick a bump; commit the generated file
-pnpm version     # apply pending changesets (bumps versions, updates changelogs)
+pnpm version-packages   # apply pending changesets (bumps versions, updates changelogs)
 pnpm release     # build and publish to npm (requires `npm login` and the @koci org)
 ```
 
