@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="../../koci-logo.svg" alt="Koci logo" width="120" />
+  <img src="https://raw.githubusercontent.com/syfqpie/koci/main/koci-logo.svg" alt="Koci logo" width="120" />
 </p>
 
 <h1 align="center">@koci/directus-exif-extension</h1>
@@ -29,12 +29,12 @@ Non-image files and images without EXIF data are skipped. Errors are logged and 
 | `gps_altitude`                              | decimal                                                  | `GPSAltitude`                            |
 | `raw`                                       | json                                                     | Full parsed EXIF payload                 |
 
-The same schema is also created by the migration in `extensions/migrations/`. Keep field names in sync between the two.
+The collection is created automatically by the hook on startup; no migration is needed.
 
 ## Requirements
 
 - Directus `^10.10.0`
-- Files stored on the **local** storage driver. The hook reads the file from `STORAGE_LOCAL_ROOT` (default `./uploads`), so other storage drivers are not supported.
+- Files stored on the **local** storage driver (the default). The hook reads the file from the location's `STORAGE_<LOCATION>_ROOT` (default `./uploads`); files on other drivers are skipped with a warning.
 
 ## Development
 

@@ -74,12 +74,21 @@ pre-commit install --hook-type commit-msg
 .
 ├── dev/                    # local Directus (docker-compose, .env, sqlite, uploads)
 ├── extensions/
-│   ├── exif-extension/     # @koci/directus-exif-extension
-│   └── migrations/         # Directus knex migrations (not a workspace package)
+│   └── exif-extension/     # @koci/directus-exif-extension
 ├── scripts/                # dev setup scripts
 ├── koci-logo.svg
 ├── package.json            # root: shared tooling only
 └── pnpm-workspace.yaml
+```
+
+## Releasing
+
+Versioning and publishing use [Changesets](https://github.com/changesets/changesets):
+
+```bash
+pnpm changeset   # describe the change and pick a bump; commit the generated file
+pnpm version     # apply pending changesets (bumps versions, updates changelogs)
+pnpm release     # build and publish to npm (requires `npm login` and the @koci org)
 ```
 
 ## Adding a new extension
