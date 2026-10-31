@@ -5,6 +5,7 @@
   "description": "Tepung Pelita (@tepungpelita/*) - Directus extensions and Strapi plugins monorepo",
   "scripts": {
     "dev": "turbo run dev",
+    "dev:directus": "pnpm dev -F @tepungpelita/directus-exif-extension",
     "build": "turbo run build",
     "link": "turbo run link",
     "lint": "eslint .",
