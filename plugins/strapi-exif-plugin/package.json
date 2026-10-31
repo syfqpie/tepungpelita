@@ -48,7 +48,8 @@
     "build": "strapi-plugin build",
     "dev": "strapi-plugin watch",
     "test": "vitest run",
-    "verify": "strapi-plugin verify"
+    "verify": "strapi-plugin verify",
+    "typecheck": "tsc -p admin/tsconfig.json --noEmit && tsc -p server/tsconfig.json --noEmit --ignoreDeprecations 6.0"
   },
   "dependencies": {
     "@strapi/design-system": "^2.2.4",

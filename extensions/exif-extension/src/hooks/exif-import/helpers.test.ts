@@ -1,6 +1,6 @@
 import exifr from 'exifr'
 import { describe, expect, it } from 'vitest'
-import { EXIF_OPTIONS, getLocalStorageRoot, toExifRecord } from './helpers'
+import { canReadExif, EXIF_OPTIONS, getLocalStorageRoot, toExifRecord } from './helpers'
 
 describe('toExifRecord', () => {
 	it('maps EXIF tags to exif_metadata fields', () => {
@@ -60,6 +60,19 @@ describe('toExifRecord', () => {
 		expect(record.camera_make).toBeNull()
 		expect(record.date_taken).toBeNull()
 		expect(record.gps_altitude).toBeNull()
+	})
+})
+
+describe('canReadExif', () => {
+	it('accepts the formats exifr can parse', () => {
+		expect(canReadExif('image/jpeg')).toBe(true)
+		expect(canReadExif('image/heic')).toBe(true)
+	})
+
+	it('rejects other formats, and files with no stored type (Directus uses null)', () => {
+		expect(canReadExif('image/webp')).toBe(false)
+		expect(canReadExif(null)).toBe(false)
+		expect(canReadExif(undefined)).toBe(false)
 	})
 })
 

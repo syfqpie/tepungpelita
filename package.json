@@ -21,7 +21,8 @@
     "docker:up:strapi": "docker compose -f ./dev/strapi/docker-compose.yml up -d",
     "docker:down:strapi": "docker compose -f ./dev/strapi/docker-compose.yml down",
     "docker:restart:strapi": "docker compose -f ./dev/strapi/docker-compose.yml --env-file ./dev/strapi/.env restart",
-    "docker:logs:strapi": "docker compose -f ./dev/strapi/docker-compose.yml logs -f strapi"
+    "docker:logs:strapi": "docker compose -f ./dev/strapi/docker-compose.yml logs -f strapi",
+    "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
     "@changesets/changelog-github": "^1.0.1",

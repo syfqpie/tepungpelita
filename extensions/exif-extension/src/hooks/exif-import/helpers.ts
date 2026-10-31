@@ -18,7 +18,7 @@ export const EXIF_OPTIONS = {
 /** Formats `exifr` can read. It throws "Unknown file format" for anything else (WebP, GIF, SVG...). */
 const EXIF_MIME_TYPES = ['image/jpeg', 'image/png', 'image/tiff', 'image/heic', 'image/heif', 'image/avif']
 
-export const canReadExif = (mime?: string): boolean => EXIF_MIME_TYPES.includes(mime ?? '')
+export const canReadExif = (mime?: string | null): boolean => EXIF_MIME_TYPES.includes(mime ?? '')
 
 /** EXIF tags as returned by `exifr`; only the ones we read are typed. */
 export interface ExifData {

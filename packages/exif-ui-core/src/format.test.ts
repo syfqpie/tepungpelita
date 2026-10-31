@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { cameraName, formatAperture, formatFocalLength, formatGps, formatShutter, formatSize, formatTaken } from './format'
+import { cameraName, formatAperture, formatFocalLength, formatGps, formatShutter, formatSize, formatTaken, formatTakenTime } from './format'
 
 describe('formatShutter', () => {
 	it('shows fast shutters as a fraction', () => {
@@ -54,5 +54,12 @@ describe('cameraName', () => {
 		expect(cameraName('FUJIFILM', 'X-T20')).toBe('FUJIFILM X-T20')
 		expect(cameraName(null, 'X-T20')).toBe('X-T20')
 		expect(cameraName('Canon', null)).toBe('Canon')
+	})
+})
+
+describe('formatTakenTime', () => {
+	it('shows the stored clock time without a timezone shift', () => {
+		expect(formatTakenTime('2025-01-01T00:23:17.000Z', 'en-GB')).toBe('00:23')
+		expect(formatTakenTime(null)).toBe('')
 	})
 })

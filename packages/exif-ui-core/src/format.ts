@@ -32,3 +32,7 @@ export const formatTaken = (iso: Maybe<string>, { time = true, locale }: { time?
 	iso
 		? new Date(iso).toLocaleString(locale, { dateStyle: 'medium', ...(time ? { timeStyle: 'medium' } : {}), timeZone: 'UTC' })
 		: ''
+
+/** The time of day only, as UTC for the same reason as `formatTaken`. */
+export const formatTakenTime = (iso: Maybe<string>, locale?: string): string =>
+	iso ? new Date(iso).toLocaleTimeString(locale, { timeStyle: 'short', timeZone: 'UTC' }) : ''
