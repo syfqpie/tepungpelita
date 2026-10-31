@@ -1,4 +1,3 @@
-import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import type { Core } from '@strapi/strapi'
 import exifr from 'exifr'
@@ -25,9 +24,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => {
 				return
 			}
 
-			const buffer = await readFile(path.join(strapi.dirs.static.public, file.url))
-
-			const exifData = await exifr.parse(buffer, {
+			// Parsing by path lets exifr read only the header chunks instead of the whole image.
+			const exifData = await exifr.parse(path.join(strapi.dirs.static.public, file.url), {
 				tiff: true,
 				exif: true,
 				gps: true,

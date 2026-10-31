@@ -1,4 +1,3 @@
-import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { defineHook } from '@directus/extensions-sdk'
 import exifr from 'exifr'
@@ -39,10 +38,8 @@ export default defineHook((hookEvents, context) => {
 				return
 			}
 
-			const filePath = path.resolve(root, file.filename_disk)
-			const buffer = await readFile(filePath)
-
-			const exifData = await exifr.parse(buffer, {
+			// Parsing by path lets exifr read only the header chunks instead of the whole image.
+			const exifData = await exifr.parse(path.resolve(root, file.filename_disk), {
 				tiff: true,
 				exif: true,
 				gps: true,
