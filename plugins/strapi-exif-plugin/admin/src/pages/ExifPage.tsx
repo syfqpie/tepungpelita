@@ -6,6 +6,9 @@ import {
 	LinkButton,
 	Loader,
 	Main,
+	Searchbar,
+	SingleSelect,
+	SingleSelectOption,
 	Table,
 	Tbody,
 	Td,
@@ -22,11 +25,12 @@ import styled from 'styled-components'
 import AboutButton from '../components/AboutButton'
 import DetailPanel from '../components/DetailPanel'
 import Readout from '../components/Readout'
-import type { ExifRow } from '../types'
-import { assetUrl, backendUrl, cameraName, formatTaken, saveFile, thumbUrl, toCsv } from '../utils'
+import type { ExifFolder, ExifRow } from '../types'
+import { assetUrl, backendUrl, cameraName, folderOptions, formatTaken, saveFile, thumbUrl, toCsv } from '../utils'
 
 const PAGE_SIZE = 20
 const EXPORT_PAGE_SIZE = 100
+const SEARCH_DELAY = 300
 
 interface Pagination {
 	page: number
@@ -74,6 +78,16 @@ const ExportButton = styled(Button)`
 	}
 `
 
+// Both controls fill their slot: the search takes the remaining width, the folder picker a fixed one.
+const FilterSlot = styled.div<{ $fixed?: boolean }>`
+	flex: ${({ $fixed }) => ($fixed ? '0 0 24rem' : '1 1 24rem')};
+	min-width: 0;
+
+	> * {
+		width: 100%;
+	}
+`
+
 const Thumb = styled.img`
 	flex: none;
 	width: 5.6rem;
@@ -94,12 +108,45 @@ const ExifPage = () => {
 	const [selected, setSelected] = useState<ExifRow | null>(null)
 	const [exporting, setExporting] = useState(false)
 	const [exportError, setExportError] = useState<string | null>(null)
+	const [searchInput, setSearchInput] = useState('')
+	const [search, setSearch] = useState('')
+	const [folder, setFolder] = useState('')
+	const [folders, setFolders] = useState<ExifFolder[]>([])
+
+	const filtersActive = Boolean(search || folder)
+	const filterParams = { ...(search && { search }), ...(folder && { folder }) }
+	const folderChoices = folderOptions(folders)
+
+	// Wait for a pause in typing before asking the server.
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setSearch(searchInput.trim())
+			setPage(1)
+		}, SEARCH_DELAY)
+
+		return () => clearTimeout(timer)
+	}, [searchInput])
+
+	useEffect(() => {
+		get<{ results: ExifFolder[] }>('/exif/folders')
+			.then(({ data }) => setFolders(data.results))
+			.catch(() => setFolders([])) // the filter just stays hidden
+	}, [get])
+
+	const clearFilters = () => {
+		setSearchInput('')
+		setSearch('')
+		setFolder('')
+		setPage(1)
+	}
 
 	useEffect(() => {
 		let cancelled = false
 
 		setLoading(true)
-		get<{ results: ExifRow[]; pagination: Pagination }>('/exif/images', { params: { page, pageSize: PAGE_SIZE } })
+		get<{ results: ExifRow[]; pagination: Pagination }>('/exif/images', {
+			params: { page, pageSize: PAGE_SIZE, ...(search && { search }), ...(folder && { folder }) },
+		})
 			.then(({ data }) => {
 				if (cancelled) return
 				setRows(data.results)
@@ -119,7 +166,7 @@ const ExifPage = () => {
 		return () => {
 			cancelled = true
 		}
-	}, [get, page])
+	}, [get, page, search, folder])
 
 	// Closing hands focus back to the row that was open, so keyboard users keep their place.
 	const close = useCallback(() => {
@@ -149,7 +196,7 @@ const ExifPage = () => {
 
 			for (let next = 1, pages = 1; next <= pages; next += 1) {
 				const { data } = await get<{ results: ExifRow[]; pagination: Pagination }>('/exif/images', {
-					params: { page: next, pageSize: EXPORT_PAGE_SIZE },
+					params: { page: next, pageSize: EXPORT_PAGE_SIZE, ...filterParams },
 				})
 
 				all.push(...data.results)
@@ -158,7 +205,7 @@ const ExifPage = () => {
 
 			// The BOM makes Excel read the file as UTF-8.
 			saveFile(
-				`exif-${new Date().toISOString().slice(0, 10)}.csv`,
+				`exif${filtersActive ? '-filtered' : ''}-${new Date().toISOString().slice(0, 10)}.csv`,
 				'text/csv;charset=utf-8',
 				`\uFEFF${toCsv(all, backendUrl() || window.location.origin)}`,
 			)
@@ -173,7 +220,7 @@ const ExifPage = () => {
 		<Main>
 			<Layouts.Header
 				title="EXIF"
-				subtitle={`${pagination.total} image${pagination.total === 1 ? '' : 's'} with EXIF metadata`}
+				subtitle={`${pagination.total} ${filtersActive ? 'matching ' : ''}image${pagination.total === 1 ? '' : 's'}${filtersActive ? '' : ' with EXIF metadata'}`}
 				secondaryAction={<AboutButton />}
 				primaryAction={
 					<ExportButton
@@ -188,6 +235,46 @@ const ExifPage = () => {
 			/>
 			<Layouts.Content>
 				{exportError && <Typography textColor="danger600">{exportError}</Typography>}
+				{!denied && !error && (filtersActive || loading || rows.length > 0) && (
+					<Flex gap={3} wrap="wrap" paddingBottom={4}>
+						<FilterSlot>
+							<Searchbar
+								name="exif-search"
+								value={searchInput}
+								onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearchInput(event.target.value)}
+								onClear={() => setSearchInput('')}
+								clearLabel="Clear search"
+								placeholder="Search name, camera or lens"
+							>
+								Search images
+							</Searchbar>
+						</FilterSlot>
+						{folderChoices.length > 0 && (
+							<FilterSlot $fixed>
+								<SingleSelect
+									aria-label="Folder"
+									placeholder="All folders"
+									value={folder}
+									onChange={(value: string | number) => {
+										setFolder(String(value))
+										setPage(1)
+									}}
+									onClear={() => {
+										setFolder('')
+										setPage(1)
+									}}
+									clearLabel="Show all folders"
+								>
+									{folderChoices.map(({ value, label }) => (
+										<SingleSelectOption key={value} value={value}>
+											{label}
+										</SingleSelectOption>
+									))}
+								</SingleSelect>
+							</FilterSlot>
+						)}
+					</Flex>
+				)}
 				{denied ? (
 					<EmptyStateLayout
 						icon={<EmptyPermissions width="16rem" />}
@@ -197,6 +284,16 @@ const ExifPage = () => {
 					<Typography textColor="danger600">{error}</Typography>
 				) : loading ? (
 					<Loader>Loading EXIF data</Loader>
+				) : rows.length === 0 && filtersActive ? (
+					<EmptyStateLayout
+						icon={<EmptyPictures width="16rem" />}
+						content="No photos match these filters."
+						action={
+							<Button variant="secondary" onClick={clearFilters}>
+								Clear filters
+							</Button>
+						}
+					/>
 				) : rows.length === 0 ? (
 					<EmptyStateLayout
 						icon={<EmptyPictures width="16rem" />}

@@ -1,4 +1,4 @@
-import type { ExifFile, ExifRow } from './types'
+import type { ExifFile, ExifFolder, ExifRow } from './types'
 
 type Maybe<T> = T | null | undefined
 
@@ -119,4 +119,21 @@ export const saveFile = (filename: string, mime: string, content: string): void 
 	link.download = filename
 	link.click()
 	setTimeout(() => URL.revokeObjectURL(url), 1000)
+}
+
+/** Folder choices labelled with their ancestry ("Trips / 2025"), sorted by that label. */
+export const folderOptions = (folders: ExifFolder[]): { value: string; label: string }[] => {
+	const nameByPathId = new Map(folders.map((folder) => [String(folder.pathId), folder.name]))
+
+	return folders
+		.map((folder) => ({
+			value: String(folder.id),
+			label:
+				folder.path
+					.split('/')
+					.filter(Boolean)
+					.map((pathId) => nameByPathId.get(pathId) ?? pathId)
+					.join(' / ') || folder.name,
+		}))
+		.sort((a, b) => a.label.localeCompare(b.label))
 }

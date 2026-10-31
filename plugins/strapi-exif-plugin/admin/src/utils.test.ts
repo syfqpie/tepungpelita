@@ -7,6 +7,7 @@ import {
 	formatGps,
 	formatShutter,
 	formatSize,
+	folderOptions,
 	formatTaken,
 	jsonFileName,
 	formatTagValue,
@@ -95,12 +96,12 @@ describe('tagEntries', () => {
 })
 
 describe('image urls', () => {
-	const file = { name: 'a', url: '/a.jpg', formats: { small: { url: '/s.jpg' }, thumbnail: { url: '/t.jpg' } } }
+	const file = { id: 1, name: 'a', url: '/a.jpg', formats: { small: { url: '/s.jpg' }, thumbnail: { url: '/t.jpg' } } }
 
 	it('prefers the thumbnail for lists and the largest format for the preview', () => {
 		expect(thumbUrl(file)).toBe('/t.jpg')
 		expect(previewUrl(file)).toBe('/s.jpg')
-		expect(previewUrl({ name: 'a', url: '/a.jpg' })).toBe('/a.jpg')
+		expect(previewUrl({ id: 1, name: 'a', url: '/a.jpg' })).toBe('/a.jpg')
 	})
 })
 
@@ -171,5 +172,25 @@ describe('cameraName', () => {
 		expect(cameraName('FUJIFILM', 'X-T20')).toBe('FUJIFILM X-T20')
 		expect(cameraName(null, 'X-T20')).toBe('X-T20')
 		expect(cameraName('Canon', null)).toBe('Canon')
+	})
+})
+
+describe('folderOptions', () => {
+	it('labels nested folders with their parents and sorts by label', () => {
+		expect(
+			folderOptions([
+				{ id: 5, pathId: 7, name: '2025', path: '/3/7' },
+				{ id: 2, pathId: 9, name: 'Family', path: '/9' },
+				{ id: 1, pathId: 3, name: 'Trips', path: '/3' },
+			]),
+		).toEqual([
+			{ value: '2', label: 'Family' },
+			{ value: '1', label: 'Trips' },
+			{ value: '5', label: 'Trips / 2025' },
+		])
+	})
+
+	it('falls back to the folder name when the path is empty', () => {
+		expect(folderOptions([{ id: 1, pathId: 1, name: 'Solo', path: '' }])).toEqual([{ value: '1', label: 'Solo' }])
 	})
 })

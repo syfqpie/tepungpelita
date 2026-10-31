@@ -26,3 +26,11 @@ export interface ExifRow {
 	raw?: Record<string, unknown> | null
 	file?: ExifFile | null
 }
+
+export interface ExifFolder {
+	id: number
+	/** A folder's `path` is built from `pathId`s, not ids. */
+	pathId: number
+	name: string
+	path: string
+}
