@@ -40,6 +40,11 @@
 				"type": "hook",
 				"name": "exif-import",
 				"source": "src/hooks/exif-import/index.ts"
+			},
+			{
+				"type": "module",
+				"name": "exif",
+				"source": "src/modules/exif/index.ts"
 			}
 		],
 		"host": ">=10.10.0"
@@ -55,6 +60,7 @@
 	"devDependencies": {
 		"@directus/extensions-sdk": "18.0.6",
 		"@directus/types": "^18.0.0",
+		"@tepungpelita/exif-ui-core": "workspace:*",
 		"vitest": "^5.0.5"
 	},
 	"dependencies": {
