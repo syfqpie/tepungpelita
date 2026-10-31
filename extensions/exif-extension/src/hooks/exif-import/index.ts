@@ -51,18 +51,20 @@ export default defineHook((hookEvents, context) => {
 				userComment: false,
 			})
 
-			if (!exifData) {
-				logger.info(`[exif-extension] no EXIF data found for file ${key}`)
-				return
-			}
-
-			const record = toExifRecord(key, exifData)
-
 			const existing = await exifService.readByQuery({
 				filter: { file: { _eq: key } },
 				fields: ['id'],
 				limit: 1,
 			})
+
+			if (!exifData) {
+				// A replaced image must not keep the previous image's EXIF (e.g. its GPS).
+				if (existing.length > 0) await exifService.deleteOne(existing[0].id)
+				logger.info(`[exif-extension] no EXIF data found for file ${key}`)
+				return
+			}
+
+			const record = toExifRecord(key, exifData)
 
 			if (existing.length > 0) {
 				await exifService.updateOne(existing[0].id, record)

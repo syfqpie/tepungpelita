@@ -7,7 +7,7 @@ vi.mock('exifr', () => ({ default: { parse: vi.fn() } }))
 const parse = vi.mocked(exifr.parse)
 
 const setup = (file: Record<string, unknown>, existing: { id: string }[] = []) => {
-	const items = { readByQuery: vi.fn().mockResolvedValue(existing), createOne: vi.fn(), updateOne: vi.fn() }
+	const items = { readByQuery: vi.fn().mockResolvedValue(existing), createOne: vi.fn(), updateOne: vi.fn(), deleteOne: vi.fn() }
 	const context: any = {
 		getSchema: async () => ({}),
 		logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
@@ -71,5 +71,15 @@ describe('files.upload hook', () => {
 		await upload()
 
 		expect(items.createOne).not.toHaveBeenCalled()
+		expect(items.deleteOne).not.toHaveBeenCalled()
+	})
+
+	it('removes the old row when the replacement has no EXIF', async () => {
+		parse.mockResolvedValue(undefined)
+		const { items, upload } = setup(image, [{ id: 'r1' }])
+
+		await upload()
+
+		expect(items.deleteOne).toHaveBeenCalledWith('r1')
 	})
 })
