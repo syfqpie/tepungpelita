@@ -36,6 +36,14 @@ interface Pagination {
 
 const rowId = (id: number) => `exif-row-${id}`
 
+const NAME_STYLE = {
+	display: 'block',
+	maxWidth: '22rem',
+	overflow: 'hidden',
+	textOverflow: 'ellipsis',
+	whiteSpace: 'nowrap',
+} as const
+
 // `&&` raises specificity above the design system's own row background.
 const SelectableRow = styled(Tr)`
 	cursor: pointer;
@@ -246,6 +254,7 @@ interface ExifTableRowProps {
 
 const ExifTableRow = ({ row, selected, onSelect }: ExifTableRowProps) => {
 	const thumb = row.file ? thumbUrl(row.file) : null
+	const name = row.file?.name ?? '(file removed)'
 
 	return (
 		<SelectableRow
@@ -263,8 +272,9 @@ const ExifTableRow = ({ row, selected, onSelect }: ExifTableRowProps) => {
 			<Td>
 				<Flex gap={3} alignItems="center">
 					{thumb && <Thumb src={assetUrl(thumb, backendUrl())} alt="" />}
-					<Typography fontWeight="semiBold" style={{ overflowWrap: 'anywhere' }}>
-						{row.file?.name ?? '(file removed)'}
+					{/* One line with an ellipsis: table cells don't wrap, so a long name would otherwise push the other columns away. */}
+					<Typography fontWeight="semiBold" title={name} style={NAME_STYLE}>
+						{name}
 					</Typography>
 				</Flex>
 			</Td>
