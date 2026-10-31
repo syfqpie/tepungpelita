@@ -1,6 +1,6 @@
 {
 	"name": "@tepungpelita/strapi-exif-plugin",
-	"version": "0.0.0",
+	"version": "0.1.0",
 	"description": "Extract EXIF metadata from uploaded images and store it in Strapi.",
 	"license": "MIT",
 	"author": "syfqpie",

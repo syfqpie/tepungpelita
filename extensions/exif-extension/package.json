@@ -2,7 +2,7 @@
 	"name": "@tepungpelita/directus-exif-extension",
 	"description": "Import files with EXIF metadata and manage them in Directus.",
 	"icon": "camera",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"license": "MIT",
 	"author": "syfqpie",
 	"homepage": "https://github.com/syfqpie/tepungpelita/tree/main/extensions/exif-extension#readme",
