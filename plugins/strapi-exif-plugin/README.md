@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/syfqpie/tepungpelita/main/tepungpelita-logo.svg" alt="Pelita logo" width="120" />
+</p>
+
 <h1 align="center">@tepungpelita/strapi-exif-plugin</h1>
 
 <p align="center">
@@ -18,7 +22,14 @@ This Strapi 5 plugin reads the EXIF metadata of every image you upload, stores i
 ## Install
 
 ```bash
+# npm
 npm install @tepungpelita/strapi-exif-plugin
+
+# pnpm
+pnpm add @tepungpelita/strapi-exif-plugin
+
+# yarn
+yarn add @tepungpelita/strapi-exif-plugin
 ```
 
 Strapi finds the plugin by itself; there is no config to write. Then:
