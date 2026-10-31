@@ -6,17 +6,16 @@ import styled from 'styled-components'
 import DetailPanel from '../components/DetailPanel'
 import Readout from '../components/Readout'
 import type { ExifRow } from '../types'
-import { assetUrl, formatTaken, thumbUrl } from '../utils'
+import { assetUrl, backendUrl, cameraName, formatTaken, saveFile, thumbUrl, toCsv } from '../utils'
 
 const PAGE_SIZE = 20
+const EXPORT_PAGE_SIZE = 100
 
 interface Pagination {
 	page: number
 	pageCount: number
 	total: number
 }
-
-const backendUrl = () => (window as unknown as { strapi?: { backendURL?: string } }).strapi?.backendURL ?? ''
 
 const rowId = (id: number) => `exif-row-${id}`
 
@@ -60,6 +59,8 @@ const ExifPage = () => {
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
 	const [selected, setSelected] = useState<ExifRow | null>(null)
+	const [exporting, setExporting] = useState(false)
+	const [exportError, setExportError] = useState<string | null>(null)
 
 	useEffect(() => {
 		let cancelled = false
@@ -108,13 +109,48 @@ const ExifPage = () => {
 		return () => window.removeEventListener('keydown', onKeyDown)
 	}, [selected, close])
 
+	const exportCsv = async () => {
+		setExporting(true)
+		setExportError(null)
+
+		try {
+			const all: ExifRow[] = []
+
+			for (let next = 1, pages = 1; next <= pages; next += 1) {
+				const { data } = await get<{ results: ExifRow[]; pagination: Pagination }>('/exif/images', {
+					params: { page: next, pageSize: EXPORT_PAGE_SIZE },
+				})
+
+				all.push(...data.results)
+				pages = data.pagination.pageCount
+			}
+
+			// The BOM makes Excel read the file as UTF-8.
+			saveFile(
+				`exif-${new Date().toISOString().slice(0, 10)}.csv`,
+				'text/csv;charset=utf-8',
+				`\uFEFF${toCsv(all, backendUrl() || window.location.origin)}`,
+			)
+		} catch (err) {
+			setExportError(`Could not export: ${(err as Error)?.message ?? err}`)
+		} finally {
+			setExporting(false)
+		}
+	}
+
 	return (
 		<Main>
 			<Layouts.Header
 				title="EXIF"
 				subtitle={`${pagination.total} image${pagination.total === 1 ? '' : 's'} with EXIF metadata`}
+				primaryAction={
+					<Button variant="secondary" loading={exporting} disabled={pagination.total === 0} onClick={exportCsv}>
+						Export CSV
+					</Button>
+				}
 			/>
 			<Layouts.Content>
+				{exportError && <Typography textColor="danger600">{exportError}</Typography>}
 				{error ? (
 					<Typography textColor="danger600">{error}</Typography>
 				) : loading ? (
@@ -191,7 +227,7 @@ const ExifTableRow = ({ row, selected, onSelect }: ExifTableRowProps) => {
 				</Flex>
 			</Td>
 			<Td>
-				<Typography>{[row.cameraMake, row.cameraModel].filter(Boolean).join(' ') || '–'}</Typography>
+				<Typography>{cameraName(row.cameraMake, row.cameraModel) || '–'}</Typography>
 			</Td>
 			<Td>
 				<Typography>{formatTaken(row.dateTaken, { time: false }) || '–'}</Typography>

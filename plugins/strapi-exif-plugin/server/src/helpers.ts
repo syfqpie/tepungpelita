@@ -83,6 +83,7 @@ export const toExifRecord = (fileId: number, parsed: ExifData) => {
 }
 
 type StoredFile = {
+	id: number
 	name: string
 	url: string
 	mime?: string | null
@@ -112,6 +113,7 @@ export const toImage = (row: Record<string, unknown> & { file?: StoredFile | nul
 	raw: row.raw,
 	file: row.file
 		? {
+				id: row.file.id,
 				name: row.file.name,
 				url: row.file.url,
 				mime: row.file.mime,

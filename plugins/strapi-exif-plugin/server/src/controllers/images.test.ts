@@ -14,7 +14,7 @@ const setup = (rows: unknown[] = [], total = rows.length) => {
 
 describe('images.find', () => {
 	it('returns the newest page with pagination', async () => {
-		const { query, find } = setup([{ id: 1, cameraMake: 'FUJIFILM', file: { name: 'a.jpg', url: '/a.jpg' } }], 45)
+		const { query, find } = setup([{ id: 1, cameraMake: 'FUJIFILM', file: { id: 7, name: 'a.jpg', url: '/a.jpg' } }], 45)
 
 		const body = await find({ page: '2', pageSize: '20' })
 
@@ -25,7 +25,7 @@ describe('images.find', () => {
 			offset: 20,
 		})
 		expect(body.pagination).toEqual({ page: 2, pageSize: 20, pageCount: 3, total: 45 })
-		expect(body.results[0]).toMatchObject({ id: 1, cameraMake: 'FUJIFILM', file: { name: 'a.jpg' } })
+		expect(body.results[0]).toMatchObject({ id: 1, cameraMake: 'FUJIFILM', file: { id: 7, name: 'a.jpg' } })
 	})
 
 	it('falls back to sane paging for bad input and caps the page size', async () => {

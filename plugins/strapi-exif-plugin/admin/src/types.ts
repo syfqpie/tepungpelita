@@ -1,4 +1,5 @@
 export interface ExifFile {
+	id: number
 	name: string
 	url: string
 	mime?: string | null

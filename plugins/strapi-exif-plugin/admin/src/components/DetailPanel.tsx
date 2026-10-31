@@ -1,10 +1,22 @@
 import { useEffect, useRef, useState } from 'react'
-import { Box, Divider, Flex, IconButton, Link, Searchbar, Typography } from '@strapi/design-system'
+import { Box, Button, Divider, Flex, IconButton, Link, Searchbar, Typography } from '@strapi/design-system'
 import { Cross } from '@strapi/icons'
+import { NavLink } from 'react-router-dom'
 import styled, { keyframes } from 'styled-components'
 
 import type { ExifRow } from '../types'
-import { assetUrl, formatSize, formatTaken, mapUrl, previewUrl, tagEntries } from '../utils'
+import {
+	assetUrl,
+	backendUrl,
+	cameraName,
+	formatSize,
+	formatTaken,
+	jsonFileName,
+	mapUrl,
+	previewUrl,
+	saveFile,
+	tagEntries,
+} from '../utils'
 import Readout from './Readout'
 
 const slideIn = keyframes`
@@ -99,8 +111,6 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
 	</Flex>
 )
 
-const backendUrl = () => (window as unknown as { strapi?: { backendURL?: string } }).strapi?.backendURL ?? ''
-
 const DetailPanel = ({ row, onClose }: { row: ExifRow; onClose: () => void }) => {
 	const closeRef = useRef<HTMLButtonElement>(null)
 	const [query, setQuery] = useState('')
@@ -142,13 +152,35 @@ const DetailPanel = ({ row, onClose }: { row: ExifRow; onClose: () => void }) =>
 
 				{file && <Photo src={assetUrl(previewUrl(file), backendUrl())} alt={file.name} />}
 
+				<Flex direction="column" alignItems="flex-start" gap={4}>
+					<Flex gap={5} wrap="wrap">
+						{file && (
+							<Link href={assetUrl(file.url, backendUrl())} isExternal>
+								Open image
+							</Link>
+						)}
+						{file && (
+							<Link tag={NavLink} to={`/plugins/upload?assetId=${file.id}`}>
+								Open in Media Library
+							</Link>
+						)}
+					</Flex>
+					<Button
+						variant="tertiary"
+						size="S"
+						onClick={() => saveFile(jsonFileName(file?.name), 'application/json', JSON.stringify(row, null, 2))}
+					>
+						Download JSON
+					</Button>
+				</Flex>
+
 				<Readout row={row} large />
 
 				<Divider />
 
 				<Section title="Camera">
 					<Facts>
-						<Fact label="Body">{[row.cameraMake, row.cameraModel].filter(Boolean).join(' ') || '–'}</Fact>
+						<Fact label="Body">{cameraName(row.cameraMake, row.cameraModel) || '–'}</Fact>
 						<Fact label="Lens">{row.lensModel ?? '–'}</Fact>
 						<Fact label="Taken">{formatTaken(row.dateTaken) || '–'}</Fact>
 					</Facts>
