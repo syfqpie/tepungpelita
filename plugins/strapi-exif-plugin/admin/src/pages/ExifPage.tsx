@@ -2,11 +2,11 @@ import { useCallback, useEffect, useState } from 'react'
 import {
 	Button,
 	EmptyStateLayout,
+	Field,
 	Flex,
 	LinkButton,
 	Loader,
 	Main,
-	Searchbar,
 	SingleSelect,
 	SingleSelectOption,
 	Table,
@@ -17,6 +17,7 @@ import {
 	Tr,
 	Typography,
 } from '@strapi/design-system'
+import { Cross, Search } from '@strapi/icons'
 import { EmptyPermissions, EmptyPictures } from '@strapi/icons/symbols'
 import { Layouts, useFetchClient } from '@strapi/strapi/admin'
 import { NavLink } from 'react-router-dom'
@@ -238,20 +239,29 @@ const ExifPage = () => {
 				{!denied && !error && (filtersActive || loading || rows.length > 0) && (
 					<Flex gap={3} wrap="wrap" paddingBottom={4}>
 						<FilterSlot>
-							<Searchbar
-								name="exif-search"
-								value={searchInput}
-								onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearchInput(event.target.value)}
-								onClear={() => setSearchInput('')}
-								clearLabel="Clear search"
-								placeholder="Search name, camera or lens"
-							>
-								Search images
-							</Searchbar>
+							{/* A plain small field rather than the design system's Searchbar, which adds a border ring and ends up taller than the folder picker. */}
+							<Field.Root name="exif-search">
+								<Field.Input
+									size="S"
+									aria-label="Search images"
+									placeholder="Search name, camera or lens"
+									value={searchInput}
+									onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearchInput(event.target.value)}
+									startAction={<Search fill="neutral600" aria-hidden />}
+									endAction={
+										searchInput ? (
+											<Field.Action label="Clear search" onClick={() => setSearchInput('')}>
+												<Cross fill="neutral600" />
+											</Field.Action>
+										) : undefined
+									}
+								/>
+							</Field.Root>
 						</FilterSlot>
 						{folderChoices.length > 0 && (
 							<FilterSlot $fixed>
 								<SingleSelect
+									size="S"
 									aria-label="Folder"
 									placeholder="All folders"
 									value={folder}
