@@ -15,5 +15,12 @@
 # but keep the example file
 !.env.example
 
-dev/database
-dev/uploads
+dev/*/database
+dev/*/uploads
+dev/strapi/public/uploads
+dev/strapi/.tmp
+dev/strapi/.strapi
+dev/strapi/.cache
+dev/strapi/build
+
+.tepung

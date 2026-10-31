@@ -7,7 +7,7 @@ services:
     volumes:
       - ./database:/directus/database
       - ./uploads:/directus/uploads
-      - ../extensions:/directus/extensions
+      - ../../extensions:/directus/extensions
     env_file:
       - .env
     environment:

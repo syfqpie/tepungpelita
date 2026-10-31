@@ -1,0 +1,40 @@
+{
+	"kind": "collectionType",
+	"collectionName": "exif_metadata",
+	"info": {
+		"singularName": "exif-metadata",
+		"pluralName": "exif-metadatas",
+		"displayName": "EXIF Metadata"
+	},
+	"options": {
+		"draftAndPublish": false
+	},
+	"pluginOptions": {
+		"content-type-builder": {
+			"visible": false
+		},
+		"content-manager": {
+			"visible": false
+		}
+	},
+	"attributes": {
+		"file": {
+			"type": "relation",
+			"relation": "oneToOne",
+			"target": "plugin::upload.file"
+		},
+		"cameraMake": { "type": "string" },
+		"cameraModel": { "type": "string" },
+		"lensModel": { "type": "string" },
+		"dateTaken": { "type": "datetime" },
+		"orientation": { "type": "integer" },
+		"iso": { "type": "integer" },
+		"focalLength": { "type": "float" },
+		"aperture": { "type": "float" },
+		"exposureTime": { "type": "float" },
+		"gpsLatitude": { "type": "float" },
+		"gpsLongitude": { "type": "float" },
+		"gpsAltitude": { "type": "float" },
+		"raw": { "type": "json" }
+	}
+}

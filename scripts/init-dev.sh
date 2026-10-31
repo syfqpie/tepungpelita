@@ -6,21 +6,42 @@
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-DEV_DIR="$ROOT_DIR/dev"
+DEV_DIR="$ROOT_DIR/dev/directus"
 
 echo "==> Creating directories"
 mkdir -p "$DEV_DIR/database" "$DEV_DIR/uploads"
 
-echo "==> Setting up dev/.env"
+echo "==> Setting up dev/directus/.env"
 
 if [ ! -f "$DEV_DIR/.env" ]; then
   cp "$DEV_DIR/.env.example" "$DEV_DIR/.env"
   # Generate a random SECRET instead of leaving the placeholder value.
   SECRET="$(openssl rand -hex 32 2>/dev/null || head -c 32 /dev/urandom | base64)"
   sed -i.bak "s|^SECRET=.*|SECRET=$SECRET|" "$DEV_DIR/.env" && rm -f "$DEV_DIR/.env.bak"
-  echo "    Created dev/.env from dev/.env.example (edit ADMIN_EMAIL / ADMIN_PASSWORD as needed)"
+  echo "    Created dev/directus/.env from dev/directus/.env.example (edit ADMIN_EMAIL / ADMIN_PASSWORD as needed)"
 else
-  echo "    dev/.env already exists, skipping"
+  echo "    dev/directus/.env already exists, skipping"
+fi
+
+echo "==> Setting up dev/strapi/.env"
+STRAPI_DIR="$ROOT_DIR/dev/strapi"
+mkdir -p "$STRAPI_DIR/database" "$STRAPI_DIR/public/uploads"
+
+if [ ! -f "$STRAPI_DIR/.env" ]; then
+  cp "$STRAPI_DIR/.env.example" "$STRAPI_DIR/.env"
+  rand() { openssl rand -base64 16 2>/dev/null || head -c 16 /dev/urandom | base64; }
+  APP_KEYS="$(rand),$(rand),$(rand),$(rand)"
+  sed -i.bak \
+    -e "s|^APP_KEYS=.*|APP_KEYS=\"$APP_KEYS\"|" \
+    -e "s|^API_TOKEN_SALT=.*|API_TOKEN_SALT=$(rand)|" \
+    -e "s|^ADMIN_JWT_SECRET=.*|ADMIN_JWT_SECRET=$(rand)|" \
+    -e "s|^TRANSFER_TOKEN_SALT=.*|TRANSFER_TOKEN_SALT=$(rand)|" \
+    -e "s|^JWT_SECRET=.*|JWT_SECRET=$(rand)|" \
+    -e "s|^ENCRYPTION_KEY=.*|ENCRYPTION_KEY=$(rand)|" \
+    "$STRAPI_DIR/.env" && rm -f "$STRAPI_DIR/.env.bak"
+  echo "    Created dev/strapi/.env from dev/strapi/.env.example with generated secrets"
+else
+  echo "    dev/strapi/.env already exists, skipping"
 fi
 
 echo "==> Installing workspace dependencies"
@@ -44,4 +65,4 @@ else
     echo "    pre-commit install --hook-type commit-msg"
 fi
 
-echo "==> Done. You can now run: pnpm docker:up"
+echo "==> Done. You can now run: pnpm docker:up:directus"

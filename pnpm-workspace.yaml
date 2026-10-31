@@ -1,5 +1,8 @@
 packages:
   - "extensions/*"
+  - "plugins/*"
 allowBuilds:
+  '@swc/core': false
+  core-js-pure: false
   esbuild: true
   vue-demi: true

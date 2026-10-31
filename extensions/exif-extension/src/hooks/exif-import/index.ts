@@ -1,9 +1,8 @@
-import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { defineHook } from '@directus/extensions-sdk'
 import exifr from 'exifr'
 
-import { getLocalStorageRoot, toExifRecord } from './helpers'
+import { canReadExif, EXIF_OPTIONS, getLocalStorageRoot, toExifRecord } from './helpers'
 import { ensureCollectionExists } from './services'
 import { COLLECTION } from './schemas/exif-metadata'
 
@@ -15,11 +14,9 @@ export default defineHook((hookEvents, context) => {
 
 	/**
 	 * Reads each uploaded image from local storage, extracts its EXIF data and
-	 * upserts one `exif_metadata` row per file. Skips non-images and files without EXIF.
+	 * upserts one `exif_metadata` row per file. Skips formats exifr can't read and files without EXIF.
 	 */
-	action('files.upload', async ({ key, collection }) => {
-		if (collection !== 'directus_files') return
-
+	action('files.upload', async ({ key }) => {
 		try {
 			const schema = await getSchema()
 			const filesService = new services.FilesService({ schema })
@@ -29,7 +26,7 @@ export default defineHook((hookEvents, context) => {
 				fields: ['id', 'type', 'filename_disk', 'storage'],
 			})
 
-			if (!file.type?.startsWith('image/')) return
+			if (!canReadExif(file.type)) return
 
 			// Only the local storage driver is supported; the file is read straight from disk.
 			const root = getLocalStorageRoot(env, String(file.storage))
@@ -39,33 +36,23 @@ export default defineHook((hookEvents, context) => {
 				return
 			}
 
-			const filePath = path.resolve(root, file.filename_disk)
-			const buffer = await readFile(filePath)
-
-			const exifData = await exifr.parse(buffer, {
-				tiff: true,
-				exif: true,
-				gps: true,
-				iptc: false,
-				icc: false,
-				jfif: false,
-				xmp: false,
-				makerNote: false,
-				userComment: false,
-			})
-
-			if (!exifData) {
-				logger.info(`[exif-extension] no EXIF data found for file ${key}`)
-				return
-			}
-
-			const record = toExifRecord(key, exifData)
+			// Parsing by path lets exifr read only the header chunks instead of the whole image.
+			const exifData = await exifr.parse(path.resolve(root, file.filename_disk), EXIF_OPTIONS)
 
 			const existing = await exifService.readByQuery({
 				filter: { file: { _eq: key } },
 				fields: ['id'],
 				limit: 1,
 			})
+
+			if (!exifData) {
+				// A replaced image must not keep the previous image's EXIF (e.g. its GPS).
+				if (existing.length > 0) await exifService.deleteOne(existing[0].id)
+				logger.info(`[exif-extension] no EXIF data found for file ${key}`)
+				return
+			}
+
+			const record = toExifRecord(key, exifData)
 
 			if (existing.length > 0) {
 				await exifService.updateOne(existing[0].id, record)
