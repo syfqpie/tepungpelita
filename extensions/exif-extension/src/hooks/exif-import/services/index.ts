@@ -24,9 +24,9 @@ export const ensureCollectionExists = async (context: ApiExtensionContext): Prom
 			await new services.RelationsService({ schema }).createOne(relationDefinition)
 			logger.info(`[exif-extension] created "${COLLECTION}" relation`)
 		}
-	} catch (err: any) {
+	} catch (err) {
 		// guards against race conditions when multiple API instances boot at once
-		if (err?.message?.includes('already exists')) {
+		if (err instanceof Error && err.message.includes('already exists')) {
 			logger.info(`[exif-extension] "${COLLECTION}" already exists, skipping`)
 			return
 		}

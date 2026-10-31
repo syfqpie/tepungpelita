@@ -16,9 +16,7 @@ export default defineHook((hookEvents, context) => {
 	 * Reads each uploaded image from local storage, extracts its EXIF data and
 	 * upserts one `exif_metadata` row per file. Skips non-images and files without EXIF.
 	 */
-	action('files.upload', async ({ key, collection }) => {
-		if (collection !== 'directus_files') return
-
+	action('files.upload', async ({ key }) => {
 		try {
 			const schema = await getSchema()
 			const filesService = new services.FilesService({ schema })
