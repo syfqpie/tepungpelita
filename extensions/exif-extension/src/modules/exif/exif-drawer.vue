@@ -50,7 +50,7 @@
 					<dt>Map</dt>
 					<dd><a :href="mapUrl(row.gpsLatitude, row.gpsLongitude)" target="_blank" rel="noopener">Open in OpenStreetMap</a></dd>
 				</dl>
-				<p v-else class="muted">This photo has no GPS data.</p>
+				<p v-else class="muted">This image has no GPS data.</p>
 			</section>
 
 			<section>

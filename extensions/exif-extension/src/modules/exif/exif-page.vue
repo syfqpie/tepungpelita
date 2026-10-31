@@ -1,10 +1,6 @@
 <template>
-	<private-view title="EXIF">
-		<template #title-outer:prepend>
-			<v-button class="header-icon" rounded disabled icon secondary>
-				<v-icon name="photo_camera" />
-			</v-button>
-		</template>
+	<private-view :title="NAV.images.name">
+		<template #title-outer:prepend><v-icon class="header-icon" :name="NAV.images.icon" /></template>
 
 		<template #navigation><exif-navigation /></template>
 
@@ -21,17 +17,17 @@
 				<v-select v-model="folder" :items="folderItems" show-deselect placeholder="All folders" />
 				<div class="tail">
 					<v-button v-if="filtering" secondary @click="clearFilters">Clear filters</v-button>
-					<span class="count">{{ total }} {{ total === 1 ? 'photo' : 'photos' }}</span>
+					<span class="count">{{ total }} {{ total === 1 ? 'image' : 'images' }}</span>
 				</div>
 			</div>
 
-			<v-info v-if="!loading && total === 0 && !filtering" icon="photo_camera" title="No photos with EXIF data yet">
+			<v-info v-if="!loading && total === 0 && !filtering" icon="photo_camera" title="No images with EXIF data yet">
 				Upload JPEG images in the file library and their EXIF data appears here.
 				<template #append>
 					<v-button to="/files">Open file library</v-button>
 				</template>
 			</v-info>
-			<v-info v-else-if="!loading && total === 0" icon="search_off" title="No photos match these filters">
+			<v-info v-else-if="!loading && total === 0" icon="search_off" title="No images match these filters">
 				Try a different search or choose another folder.
 			</v-info>
 			<template v-else>
@@ -101,6 +97,7 @@ import {
 import { computed, onMounted, ref, watch } from 'vue'
 import ExifDrawer from './exif-drawer.vue'
 import ExifNavigation from './exif-navigation.vue'
+import { NAV } from './nav'
 import { fetchExifPage, fetchFolders, PAGE_SIZE, thumbUrl } from './api'
 import { buildFilter, hasFilters } from './filter'
 import { type Folder, folderOptions, withDescendants } from './folders'
@@ -178,9 +175,9 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+/* Same look as Directus's own pages: a bare icon in the theme's primary colour. */
 .header-icon {
-	--v-button-background-color-disabled: var(--theme--background-normal);
-	--v-button-color-disabled: var(--theme--foreground-subdued);
+	color: var(--theme--primary);
 }
 
 .exif-page {

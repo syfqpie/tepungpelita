@@ -5,37 +5,37 @@
 <h1 align="center">@tepungpelita/directus-exif-extension</h1>
 
 <p align="center">
-  See the camera, lens, settings and location behind every photo in your Directus file library.
+  See the camera, lens, settings and location behind every image in your Directus file library.
 </p>
 
 <p align="center">
-  <img src="docs/images/overview.png" alt="The EXIF module in Directus: a list of photos with camera, date and exposure, and a sidebar with Photos and About" width="900" />
+  <img src="docs/images/overview.png" alt="The EXIF module in Directus: a list of images with camera, date and exposure, and a sidebar with Images and About" width="900" />
 </p>
 
 This Directus extension reads the EXIF metadata of every image you upload, stores it next to the file in an `exif_metadata` collection, and adds an **EXIF** module to the admin where you can browse, search and inspect it.
 
 - **Automatic.** Upload or replace an image and its EXIF is stored. Nothing to configure.
-- **An EXIF module in the admin.** A photo list with thumbnails, a details drawer with every tag, search and a folder filter.
+- **An EXIF module in the admin.** An image list with thumbnails, a details drawer with every tag, search and a folder filter.
 - **Queryable from your code.** One regular collection, linked one-to-one with `directus_files`.
 
 ## Using the EXIF module
 
 Turn the module on once: **Settings → Settings → Module Bar**, switch **EXIF** on and save. Directus does not add new modules to a module bar you have already customized.
 
-### 1. Photos
+### 1. Images
 
-Choose **EXIF** in the module bar, then **Photos** in the sidebar. You see one row per photo, newest first: thumbnail, file name and size, camera and lens, date and time taken, the main exposure settings, and a pin if the photo has GPS.
+Choose **EXIF** in the module bar, then **Images** in the sidebar. You see one row per image, newest first: thumbnail, file name and size, camera and lens, date and time taken, the main exposure settings, and a pin if the image has GPS.
 
-### 2. Click a photo for everything we know about it
+### 2. Click an image for everything we know about it
 
 A drawer opens with the exposure readout (aperture, shutter, ISO, focal length), camera body, lens and date taken, the GPS position with a link to OpenStreetMap, and **every stored tag** with a filter box. **Open image**, **File library** and **Download JSON** sit above the readout. Press `Esc` to close it.
 
 <p align="center">
-  <img src="docs/images/details.png" alt="The details drawer: photo, exposure readout, camera, lens, date taken and location" width="420" />
+  <img src="docs/images/details.png" alt="The details drawer: image, exposure readout, camera, lens, date taken and location" width="420" />
   <img src="docs/images/tags.png" alt="The all-tags list in the drawer, filtered by typing" width="420" />
 </p>
 
-### 3. Find photos
+### 3. Find images
 
 - **Search** matches the camera make, camera model, lens, file name and title, ignoring case.
 - **Folder** narrows the list to a file library folder, including its subfolders.
@@ -43,15 +43,15 @@ A drawer opens with the exposure readout (aperture, shutter, ISO, focal length),
 Both filters work across every page of results.
 
 <p align="center">
-  <img src="docs/images/filters.png" alt="The search box and folder picker above the list, with one result for 'canon'" width="900" />
+  <img src="docs/images/filters.png" alt="The search box and folder picker above the list, narrowed to the Home folder" width="900" />
 </p>
 
 ### 4. Export
 
-- **Download JSON** (in the drawer) saves one photo with all its tags.
-- For many photos at once, use Directus's own export: **Content → Exif Metadata → Import / Export**.
+- **Download JSON** (in the drawer) saves one image with all its tags.
+- For many images at once, use Directus's own export: **Content → Exif Metadata → Import / Export**.
 
-> Exports contain GPS coordinates when a photo has them. Treat them like the photos themselves.
+> Exports contain GPS coordinates when an image has them. Treat them like the images themselves.
 
 ### 5. About
 
@@ -101,11 +101,11 @@ The collection is created automatically by the hook on startup; no migration is 
 curl -H "Authorization: Bearer $TOKEN" \
   "$DIRECTUS_URL/items/exif_metadata?filter[file][_eq]=<file-id>&limit=1"
 
-# Photos taken with a given camera, newest first, with the related file info
+# Images taken with a given camera, newest first, with the related file info
 curl -H "Authorization: Bearer $TOKEN" \
   "$DIRECTUS_URL/items/exif_metadata?filter[camera_make][_eq]=Canon&sort=-date_taken&fields=id,camera_model,date_taken,file.id,file.filename_download"
 
-# Only photos that have GPS coordinates
+# Only images that have GPS coordinates
 curl -H "Authorization: Bearer $TOKEN" \
   "$DIRECTUS_URL/items/exif_metadata?filter[gps_latitude][_nnull]=true&fields=file,gps_latitude,gps_longitude"
 ```

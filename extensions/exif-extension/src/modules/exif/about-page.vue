@@ -1,10 +1,6 @@
 <template>
-	<private-view title="About">
-		<template #title-outer:prepend>
-			<v-button class="header-icon" rounded disabled icon secondary>
-				<v-icon name="info" />
-			</v-button>
-		</template>
+	<private-view :title="NAV.about.name">
+		<template #title-outer:prepend><v-icon class="header-icon" :name="NAV.about.icon" /></template>
 
 		<template #navigation><exif-navigation /></template>
 
@@ -33,15 +29,16 @@
 <script setup lang="ts">
 import { buildAbout } from '@tepungpelita/exif-ui-core'
 import ExifNavigation from './exif-navigation.vue'
+import { NAV } from './nav'
 import pkg from '../../../package.json'
 
 const about = buildAbout(pkg)
 </script>
 
 <style scoped>
+/* Same look as Directus's own pages: a bare icon in the theme's primary colour. */
 .header-icon {
-	--v-button-background-color-disabled: var(--theme--background-normal);
-	--v-button-color-disabled: var(--theme--foreground-subdued);
+	color: var(--theme--primary);
 }
 
 .about {
