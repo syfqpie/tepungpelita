@@ -1,8 +1,25 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Button, Flex, Loader, Main, Table, Tbody, Td, Th, Thead, Tr, Typography } from '@strapi/design-system'
+import {
+	Button,
+	EmptyStateLayout,
+	Flex,
+	LinkButton,
+	Loader,
+	Main,
+	Table,
+	Tbody,
+	Td,
+	Th,
+	Thead,
+	Tr,
+	Typography,
+} from '@strapi/design-system'
+import { EmptyPermissions, EmptyPictures } from '@strapi/icons/symbols'
 import { Layouts, useFetchClient } from '@strapi/strapi/admin'
+import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
+import AboutButton from '../components/AboutButton'
 import DetailPanel from '../components/DetailPanel'
 import Readout from '../components/Readout'
 import type { ExifRow } from '../types'
@@ -42,6 +59,13 @@ const SelectableRow = styled(Tr)`
 	}
 `
 
+// The design system's disabled button keeps the default cursor, which doesn't say "can't click".
+const ExportButton = styled(Button)`
+	&&[aria-disabled='true'] {
+		cursor: not-allowed;
+	}
+`
+
 const Thumb = styled.img`
 	flex: none;
 	width: 5.6rem;
@@ -58,6 +82,7 @@ const ExifPage = () => {
 	const [pagination, setPagination] = useState<Pagination>({ page: 1, pageCount: 1, total: 0 })
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
+	const [denied, setDenied] = useState(false)
 	const [selected, setSelected] = useState<ExifRow | null>(null)
 	const [exporting, setExporting] = useState(false)
 	const [exportError, setExportError] = useState<string | null>(null)
@@ -73,15 +98,13 @@ const ExifPage = () => {
 				setPagination(data.pagination)
 				setSelected(null)
 				setError(null)
+				setDenied(false)
 			})
 			.catch((err) => {
 				if (cancelled) return
 
-				setError(
-					err?.status === 403
-						? "You don't have permission to see EXIF data. It follows Media Library access, so ask an admin to allow Read on the Media Library."
-						: `Could not load EXIF data: ${err?.message ?? err}`,
-				)
+				setDenied(err?.status === 403)
+				setError(`Could not load EXIF data: ${err?.message ?? err}`)
 			})
 			.finally(() => !cancelled && setLoading(false))
 
@@ -143,20 +166,39 @@ const ExifPage = () => {
 			<Layouts.Header
 				title="EXIF"
 				subtitle={`${pagination.total} image${pagination.total === 1 ? '' : 's'} with EXIF metadata`}
+				secondaryAction={<AboutButton />}
 				primaryAction={
-					<Button variant="secondary" loading={exporting} disabled={pagination.total === 0} onClick={exportCsv}>
+					<ExportButton
+						variant="secondary"
+						loading={exporting}
+						disabled={loading || denied || Boolean(error) || pagination.total === 0}
+						onClick={exportCsv}
+					>
 						Export CSV
-					</Button>
+					</ExportButton>
 				}
 			/>
 			<Layouts.Content>
 				{exportError && <Typography textColor="danger600">{exportError}</Typography>}
-				{error ? (
+				{denied ? (
+					<EmptyStateLayout
+						icon={<EmptyPermissions width="16rem" />}
+						content="You don't have permission to see EXIF data. It follows Media Library access, so ask an admin to allow Read on the Media Library."
+					/>
+				) : error ? (
 					<Typography textColor="danger600">{error}</Typography>
 				) : loading ? (
 					<Loader>Loading EXIF data</Loader>
 				) : rows.length === 0 ? (
-					<Typography>No EXIF data yet. Upload a JPEG, PNG, TIFF, HEIC or AVIF photo to the Media Library.</Typography>
+					<EmptyStateLayout
+						icon={<EmptyPictures width="16rem" />}
+						content="No photos with EXIF data yet. Upload a JPEG, PNG, TIFF, HEIC or AVIF photo and it shows up here."
+						action={
+							<LinkButton tag={NavLink} to="/plugins/upload" variant="secondary">
+								Go to Media Library
+							</LinkButton>
+						}
+					/>
 				) : (
 					<Flex alignItems="flex-start" gap={6}>
 						<Flex direction="column" alignItems="stretch" gap={4} flex="1" minWidth={0}>
