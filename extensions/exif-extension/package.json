@@ -40,9 +40,14 @@
 				"type": "hook",
 				"name": "exif-import",
 				"source": "src/hooks/exif-import/index.ts"
+			},
+			{
+				"type": "module",
+				"name": "exif",
+				"source": "src/modules/exif/index.ts"
 			}
 		],
-		"host": ">=10.10.0"
+		"host": ">=11.0.0"
 	},
 	"scripts": {
 		"build": "directus-extension build",
@@ -50,12 +55,17 @@
 		"link": "directus-extension link",
 		"validate": "directus-extension validate",
 		"test": "vitest run",
-		"add": "directus-extension add"
+		"add": "directus-extension add",
+		"typecheck": "vue-tsc --noEmit"
 	},
 	"devDependencies": {
 		"@directus/extensions-sdk": "18.0.6",
 		"@directus/types": "^18.0.0",
-		"vitest": "^5.0.5"
+		"@tepungpelita/exif-ui-core": "workspace:*",
+		"vitest": "^5.0.5",
+		"vue": "3.5.43",
+		"vue-router": "^4.6.4",
+		"vue-tsc": "^3.3.14"
 	},
 	"dependencies": {
 		"exifr": "^7.1.3"

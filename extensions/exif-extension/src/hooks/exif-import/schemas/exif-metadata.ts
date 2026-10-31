@@ -1,4 +1,4 @@
-import type { RawCollection } from "@directus/types"
+import type { RawCollection, Relation } from "@directus/types"
 
 export const COLLECTION = 'exif_metadata'
 
@@ -8,7 +8,7 @@ export const COLLECTION = 'exif_metadata'
 export const collectionMeta = {
 	collection: COLLECTION,
 	meta: {
-		icon: 'photo_camera',
+		icon: 'camera',
 		note: 'EXIF metadata extracted from uploaded images (one row per file).',
 		display_template: '{{camera_make}} {{camera_model}}',
 	},
@@ -63,7 +63,12 @@ export const collectionMeta = {
 	],
 } as RawCollection
 
-/** One-to-one link from `exif_metadata.file` to `directus_files.id`; rows are deleted with their file. */
+/**
+ * One-to-one link from `exif_metadata.file` to `directus_files.id`; rows are deleted with their file.
+ *
+ * Directus types `schema` and `meta` as the full introspected relation, but `RelationsService.createOne`
+ * only needs the parts below, so this is cast the same way `collectionMeta` is.
+ */
 export const relationDefinition = {
 	collection: COLLECTION,
 	field: 'file',
@@ -72,4 +77,4 @@ export const relationDefinition = {
 		on_delete: 'CASCADE',
 	},
 	meta: { one_deselect_action: 'nullify' },
-}
+} as unknown as Partial<Relation> & Pick<Relation, 'collection' | 'field'>
