@@ -59,6 +59,7 @@ describe('files.upload hook', () => {
 
 	it('skips non-images and non-local storage', async () => {
 		await setup({ ...image, type: 'application/pdf' }).upload()
+		await setup({ ...image, type: 'image/webp' }).upload()
 		await setup({ ...image, storage: 's3' }).upload()
 
 		expect(parse).not.toHaveBeenCalled()

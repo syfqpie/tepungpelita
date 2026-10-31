@@ -13,7 +13,7 @@ The bundle contains a single hook, `exif-import` (`src/hooks/exif-import`):
 1. **Provisioning** — on `app.after` it creates the `exif_metadata` collection and its relation to `directus_files` if they don't exist (definition in `schemas/exif-metadata.ts`).
 2. **Import** — on `files.upload` it reads the uploaded image from disk, parses it with [`exifr`](https://github.com/MikeKovarik/exifr), and creates or updates the `exif_metadata` row for that file.
 
-Non-image files and images without EXIF data are skipped. Errors are logged and never block the upload.
+Only JPEG, PNG, TIFF, HEIC and AVIF images are read (`exifr` can't parse WebP or GIF); other files and images without EXIF data are skipped. Errors are logged and never block the upload.
 
 ## Collection: `exif_metadata`
 

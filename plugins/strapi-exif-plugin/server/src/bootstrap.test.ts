@@ -15,7 +15,10 @@ const setup = (existing: { id: number } | null = null) => {
 		deleteMany: vi.fn(),
 	}
 	let handlers: Record<string, (event: any) => Promise<void>> = {}
+	const originalOptimize = vi.fn(async (file: unknown) => file)
+	const imageManipulation = { optimize: originalOptimize }
 	const strapi: any = {
+		plugin: () => ({ service: () => imageManipulation }),
 		db: {
 			query: () => query,
 			lifecycles: { subscribe: (sub: typeof handlers) => (handlers = sub) },
@@ -26,7 +29,7 @@ const setup = (existing: { id: number } | null = null) => {
 
 	bootstrap({ strapi })
 
-	return { query, handlers, strapi }
+	return { query, handlers, strapi, imageManipulation, originalOptimize }
 }
 
 describe('exif lifecycle', () => {
@@ -42,6 +45,58 @@ describe('exif lifecycle', () => {
 
 		expect(parse).toHaveBeenCalledWith('/app/public/uploads/a.jpg', expect.anything())
 		expect(query.create).toHaveBeenCalledWith({ data: expect.objectContaining({ file: 7, cameraMake: 'Canon' }) })
+	})
+
+	it('uses the EXIF read before optimization instead of re-reading the stored file', async () => {
+		parse.mockResolvedValue({ Make: 'Canon' })
+		const { query, handlers, imageManipulation, originalOptimize } = setup()
+		const upload: { filepath: string; mime: string; _exif?: unknown } = { filepath: '/tmp/original.jpg', mime: 'image/jpeg' }
+
+		await imageManipulation.optimize(upload)
+		// the re-encoded file no longer has EXIF, so a second parse would find none
+		parse.mockResolvedValue(undefined)
+		await handlers.afterCreate({ params: { data: upload }, result: image })
+
+		expect(parse).toHaveBeenCalledOnce()
+		expect(parse).toHaveBeenCalledWith('/tmp/original.jpg', expect.anything())
+		expect(originalOptimize).toHaveBeenCalledWith(upload)
+		expect(query.create).toHaveBeenCalledWith({ data: expect.objectContaining({ cameraMake: 'Canon' }) })
+	})
+
+	it('treats an original without EXIF as final, even if the stored file is read later', async () => {
+		parse.mockResolvedValue(undefined)
+		const { query, handlers, imageManipulation } = setup({ id: 3 })
+		const upload = { filepath: '/tmp/original.jpg', mime: 'image/jpeg' }
+
+		await imageManipulation.optimize(upload)
+		await handlers.afterUpdate({ params: { data: { size: 1, ...upload } }, result: image })
+
+		expect(parse).toHaveBeenCalledOnce()
+		expect(query.deleteMany).toHaveBeenCalledWith({ where: { file: 7 } })
+	})
+
+	it('still optimizes when the original cannot be parsed', async () => {
+		parse.mockRejectedValue(new Error('corrupt'))
+		const { imageManipulation, originalOptimize, strapi } = setup()
+		const upload: { filepath: string; mime: string; _exif?: unknown } = { filepath: '/tmp/original.jpg', mime: 'image/jpeg' }
+
+		await imageManipulation.optimize(upload)
+
+		expect(originalOptimize).toHaveBeenCalledWith(upload)
+		expect(upload._exif).toBeUndefined()
+		expect(strapi.log.warn).toHaveBeenCalled()
+	})
+
+	it('skips formats exifr cannot read, before and after optimization', async () => {
+		const { query, handlers, imageManipulation, strapi } = setup()
+
+		await imageManipulation.optimize({ filepath: '/tmp/a.webp', mime: 'image/webp' } as never)
+		await handlers.afterCreate({ result: { ...image, mime: 'image/webp' } })
+
+		expect(parse).not.toHaveBeenCalled()
+		expect(query.create).not.toHaveBeenCalled()
+		expect(strapi.log.warn).not.toHaveBeenCalled()
+		expect(strapi.log.error).not.toHaveBeenCalled()
 	})
 
 	it('skips non-images and non-local providers', async () => {
