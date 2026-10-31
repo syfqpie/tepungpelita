@@ -1,3 +1,25 @@
+/**
+ * `exifr` options. `translateValues: false` keeps tags numeric: by default it turns some into
+ * text (e.g. Orientation 8 -> "Rotate 270 CW"), which the integer columns reject.
+ */
+export const EXIF_OPTIONS = {
+	tiff: true,
+	exif: true,
+	gps: true,
+	iptc: false,
+	icc: false,
+	jfif: false,
+	xmp: false,
+	makerNote: false,
+	userComment: false,
+	translateValues: false,
+}
+
+/** Formats `exifr` can read. It throws "Unknown file format" for anything else (WebP, GIF, SVG...). */
+const EXIF_MIME_TYPES = ['image/jpeg', 'image/png', 'image/tiff', 'image/heic', 'image/heif', 'image/avif']
+
+export const canReadExif = (mime?: string): boolean => EXIF_MIME_TYPES.includes(mime ?? '')
+
 /** EXIF tags as returned by `exifr`; only the ones we read are typed. */
 export interface ExifData {
 	Make?: string

@@ -1,5 +1,6 @@
+import exifr from 'exifr'
 import { describe, expect, it } from 'vitest'
-import { getLocalStorageRoot, toExifRecord } from './helpers'
+import { EXIF_OPTIONS, getLocalStorageRoot, toExifRecord } from './helpers'
 
 describe('toExifRecord', () => {
 	it('maps EXIF tags to exif_metadata fields', () => {
@@ -63,5 +64,17 @@ describe('getLocalStorageRoot', () => {
 
 	it('returns null for non-local drivers', () => {
 		expect(getLocalStorageRoot({ STORAGE_S3_DRIVER: 's3' }, 's3')).toBeNull()
+	})
+})
+
+describe('EXIF_OPTIONS', () => {
+	// Minimal JPEG whose only EXIF tag is Orientation = 6.
+	const jpeg = Buffer.from('ffd8ffe10022457869660000494 92a000800000001001201030001000000060000000000000000ffd9'.replace(/ /g, ''), 'hex')
+
+	it('keeps Orientation numeric so it fits the integer column', async () => {
+		const exif = await exifr.parse(jpeg, EXIF_OPTIONS)
+
+		expect(exif.Orientation).toBe(6)
+		expect(toExifRecord('id', exif).orientation).toBe(6)
 	})
 })
