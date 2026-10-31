@@ -20,7 +20,7 @@ services:
       - ../../plugins/strapi-exif-plugin/strapi-server.js:/opt/app/plugins/strapi-exif-plugin/strapi-server.js:ro
       - ../../plugins/strapi-exif-plugin/dist:/opt/app/plugins/strapi-exif-plugin/dist:ro
     ports:
-      - 1337:1337
+      - 127.0.0.1:1337:1337
     networks:
       - tepungpelita.dev.strapi.network
 
