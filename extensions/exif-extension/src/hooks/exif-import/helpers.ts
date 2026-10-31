@@ -38,23 +38,49 @@ export interface ExifData {
 	[tag: string]: unknown
 }
 
+/**
+ * `exifr` builds dates in the server's timezone, but EXIF times are the camera's wall clock with no
+ * timezone. Reading those local fields back as UTC makes the stored time the same on any server.
+ */
+const toWallClockUtc = (date: Date): Date =>
+	new Date(
+		Date.UTC(
+			date.getFullYear(),
+			date.getMonth(),
+			date.getDate(),
+			date.getHours(),
+			date.getMinutes(),
+			date.getSeconds(),
+			date.getMilliseconds(),
+		),
+	)
+
+const withWallClockDates = (exifData: ExifData): ExifData =>
+	Object.fromEntries(
+		Object.entries(exifData).map(([tag, value]) => [tag, value instanceof Date ? toWallClockUtc(value) : value]),
+	) as ExifData
+
 /** Maps parsed EXIF data to an `exif_metadata` row; missing tags become `null`. */
-export const toExifRecord = (fileId: string, exifData: ExifData) => ({
-	file: fileId,
-	camera_make: exifData.Make ?? null,
-	camera_model: exifData.Model ?? null,
-	lens_model: exifData.LensModel ?? null,
-	date_taken: exifData.DateTimeOriginal ?? exifData.CreateDate ?? null,
-	orientation: exifData.Orientation ?? null,
-	iso: exifData.ISO ?? null,
-	focal_length: exifData.FocalLength ?? null,
-	aperture: exifData.FNumber ?? null,
-	exposure_time: exifData.ExposureTime ?? null,
-	gps_latitude: exifData.latitude ?? null,
-	gps_longitude: exifData.longitude ?? null,
-	gps_altitude: exifData.GPSAltitude ?? null,
-	raw: exifData,
-})
+export const toExifRecord = (fileId: string, parsed: ExifData) => {
+	const exifData = withWallClockDates(parsed)
+
+	return {
+		file: fileId,
+		camera_make: exifData.Make ?? null,
+		camera_model: exifData.Model ?? null,
+		lens_model: exifData.LensModel ?? null,
+		date_taken: exifData.DateTimeOriginal ?? exifData.CreateDate ?? null,
+		orientation: exifData.Orientation ?? null,
+		iso: exifData.ISO ?? null,
+		focal_length: exifData.FocalLength ?? null,
+		aperture: exifData.FNumber ?? null,
+		exposure_time: exifData.ExposureTime ?? null,
+		gps_latitude: exifData.latitude ?? null,
+		gps_longitude: exifData.longitude ?? null,
+		gps_altitude: exifData.GPSAltitude ?? null,
+		raw: exifData,
+	}
+}
 
 /**
  * Returns the root directory of a storage location, or `null` if the location

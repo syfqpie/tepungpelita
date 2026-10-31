@@ -12,6 +12,9 @@
 	"pluginOptions": {
 		"content-type-builder": {
 			"visible": false
+		},
+		"content-manager": {
+			"visible": false
 		}
 	},
 	"attributes": {

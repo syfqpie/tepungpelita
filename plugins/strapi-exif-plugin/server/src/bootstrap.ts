@@ -2,10 +2,9 @@ import path from 'node:path'
 import type { Core } from '@strapi/strapi'
 import exifr from 'exifr'
 
+import { EXIF_UID, FILE_UID } from './constants'
 import { canReadExif, EXIF_OPTIONS, toExifRecord } from './helpers'
 
-const FILE_UID = 'plugin::upload.file'
-const EXIF_UID = 'plugin::exif.exif-metadata'
 
 /** Carries EXIF read from the original upload through Strapi's file data to the lifecycle hooks. */
 const EXIF_KEY = '_exif'

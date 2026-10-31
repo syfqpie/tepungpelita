@@ -6,6 +6,10 @@ Strapi 5 plugin that extracts EXIF metadata from uploaded images and stores it i
 
 On every media upload the plugin reads the image from disk, parses it with [`exifr`](https://github.com/MikeKovarik/exifr), and creates or updates one `exif-metadata` entry for that file. Only JPEG, PNG, TIFF, HEIC and AVIF images are read (`exifr` can't parse WebP or GIF); other files and images without EXIF data are skipped. Replacing a file refreshes its entry. Errors are logged and never block the upload. Deleting a file removes its entry.
 
+## Viewing EXIF data
+
+The plugin adds an **EXIF** entry to the admin menu. It lists each image with its thumbnail, camera, lens, date taken, exposure settings and GPS (linked to OpenStreetMap). The page reads from the plugin's own admin route (`GET /exif/images`), which requires the same permission as the Media Library: admins who can't read the Media Library get a permission message instead of data. The collection itself is hidden from the Content Manager and can't be edited there, because the entries are written by the plugin.
+
 ## Collection: `exif-metadata`
 
 UID: `plugin::exif.exif-metadata`. API ID: `exif-metadatas`.

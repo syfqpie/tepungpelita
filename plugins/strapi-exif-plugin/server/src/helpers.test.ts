@@ -4,7 +4,8 @@ import { EXIF_OPTIONS, toExifRecord } from './helpers'
 
 describe('toExifRecord', () => {
 	it('maps EXIF tags to exif-metadata fields', () => {
-		const taken = new Date('2022-12-15T06:15:15.000Z')
+		const taken = new Date(2022, 11, 15, 14, 15, 15) // as exifr builds it: local time
+		const stored = new Date('2022-12-15T14:15:15.000Z')
 		const exif = {
 			Make: 'Canon',
 			Model: 'Canon EOS R6m2',
@@ -21,19 +22,36 @@ describe('toExifRecord', () => {
 			cameraMake: 'Canon',
 			cameraModel: 'Canon EOS R6m2',
 			lensModel: 'RF24-105mm F4 L IS USM',
-			dateTaken: taken,
+			dateTaken: stored,
 			iso: 100,
 			aperture: 4,
 			gpsLatitude: 3.1,
 			gpsLongitude: 101.6,
-			raw: exif,
+			raw: { ...exif, DateTimeOriginal: stored },
 		})
 	})
 
 	it('falls back to CreateDate when DateTimeOriginal is missing', () => {
-		const created = new Date('2020-01-01T00:00:00.000Z')
+		const created = new Date(2020, 0, 1, 0, 0, 0)
 
-		expect(toExifRecord(1, { CreateDate: created }).dateTaken).toBe(created)
+		expect(toExifRecord(1, { CreateDate: created }).dateTaken).toEqual(new Date('2020-01-01T00:00:00.000Z'))
+	})
+
+	it('stores the camera wall-clock time whatever the server timezone', () => {
+		const original = process.env.TZ
+
+		try {
+			for (const zone of ['UTC', 'Asia/Kuala_Lumpur', 'America/New_York']) {
+				process.env.TZ = zone
+
+				const record = toExifRecord(1, { DateTimeOriginal: new Date(2022, 11, 15, 14, 15, 15) })
+
+				expect(record.dateTaken).toEqual(new Date('2022-12-15T14:15:15.000Z'))
+			}
+		} finally {
+			if (original === undefined) delete process.env.TZ
+			else process.env.TZ = original
+		}
 	})
 
 	it('sets missing tags to null', () => {

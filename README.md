@@ -50,7 +50,7 @@ Directus mounts `./extensions` directly, so anything built to `extensions/<name>
 | `pnpm docker:restart:strapi`   | Restart Strapi                              |
 | `pnpm docker:logs:strapi`      | Follow Strapi logs                          |
 
-`dev/strapi` is a standalone npm app run only in Docker (it has its own `package-lock.json`). It is not part of the pnpm workspace. It loads the built plugin from `plugins/strapi-exif-plugin/dist`, so run `pnpm build` before `pnpm docker:up:strapi`, and again after plugin changes (then `pnpm docker:restart:strapi`).
+`dev/strapi` is a standalone npm app run only in Docker (it has its own `package-lock.json`). It is not part of the pnpm workspace. It loads the built plugin from `plugins/strapi-exif-plugin/dist`, so run `pnpm build` once before `pnpm docker:up:strapi`. While developing, keep `pnpm dev` running: it rebuilds the plugin on every save. Strapi does not reload by itself (its dev watcher ignores `dist`, and restarting it in the middle of a rebuild boots it without the plugin, which makes Strapi drop the `exif_metadata` table). Wait for the watcher to print that the build finished, then run `pnpm docker:restart:strapi`.
 
 Typical loop:
 
