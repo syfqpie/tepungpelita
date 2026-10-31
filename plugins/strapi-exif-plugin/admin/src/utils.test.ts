@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { assetUrl, folderOptions, jsonFileName, previewUrl, thumbUrl, toCsv } from './utils'
+import { assetUrl, folderOptions, previewUrl, thumbUrl, toCsv } from './utils'
 
 describe('asset urls', () => {
 	it('prefixes only relative asset URLs with the backend', () => {
@@ -63,14 +63,6 @@ describe('toCsv', () => {
 	})
 })
 
-describe('jsonFileName', () => {
-	it('drops the extension and unsafe characters', () => {
-		expect(jsonFileName('DSCF8531.JPG')).toBe('DSCF8531-exif.json')
-		expect(jsonFileName('my photo (1).jpg')).toBe('my_photo_1_-exif.json')
-		expect(jsonFileName(undefined)).toBe('image-exif.json')
-	})
-})
-
 describe('folderOptions', () => {
 	it('labels nested folders with their parents and sorts by label', () => {
 		expect(
@@ -90,4 +82,3 @@ describe('folderOptions', () => {
 		expect(folderOptions([{ id: 1, pathId: 1, name: 'Solo', path: '' }])).toEqual([{ value: '1', label: 'Solo' }])
 	})
 })
-

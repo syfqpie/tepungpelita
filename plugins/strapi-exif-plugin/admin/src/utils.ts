@@ -1,5 +1,3 @@
-import { type Maybe } from '@tepungpelita/exif-ui-core'
-
 import type { ExifFile, ExifFolder, ExifRow } from './types'
 
 export * from '@tepungpelita/exif-ui-core'
@@ -48,20 +46,6 @@ export const toCsv = (rows: ExifRow[], origin: string): string =>
 	[CSV_COLUMNS.map(([header]) => header), ...rows.map((row) => CSV_COLUMNS.map(([, value]) => value(row, origin)))]
 		.map((line) => line.map(csvCell).join(','))
 		.join('\r\n')
-
-/** `DSCF8531.JPG` -> `DSCF8531-exif.json`, safe to use as a download name. */
-export const jsonFileName = (name: Maybe<string>): string =>
-	`${(name ?? 'image').replace(/\.[^.]+$/, '').replace(/[^\w.-]+/g, '_') || 'image'}-exif.json`
-
-export const saveFile = (filename: string, mime: string, content: string): void => {
-	const url = URL.createObjectURL(new Blob([content], { type: mime }))
-	const link = document.createElement('a')
-
-	link.href = url
-	link.download = filename
-	link.click()
-	setTimeout(() => URL.revokeObjectURL(url), 1000)
-}
 
 /** Folder choices labelled with their ancestry ("Trips / 2025"), sorted by that label. */
 export const folderOptions = (folders: ExifFolder[]): { value: string; label: string }[] => {

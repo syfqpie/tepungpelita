@@ -61,7 +61,9 @@
 		"@directus/extensions-sdk": "18.0.6",
 		"@directus/types": "^18.0.0",
 		"@tepungpelita/exif-ui-core": "workspace:*",
-		"vitest": "^5.0.5"
+		"vitest": "^5.0.5",
+		"vue": "3.5.43",
+		"vue-router": "^4.6.4"
 	},
 	"dependencies": {
 		"exifr": "^7.1.3"
