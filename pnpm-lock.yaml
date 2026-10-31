@@ -234,6 +234,9 @@ importers:
       '@strapi/typescript-utils':
         specifier: ^5.58.0
         version: 5.58.0
+      '@tepungpelita/exif-ui-core':
+        specifier: workspace:*
+        version: link:../../packages/exif-ui-core
       '@types/react':
         specifier: ^18.3.31
         version: 18.3.31
