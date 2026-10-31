@@ -2,7 +2,7 @@ packages:
   - "extensions/*"
   - "plugins/*"
 allowBuilds:
-  '@swc/core': set this to true or false
-  core-js-pure: set this to true or false
+  '@swc/core': false
+  core-js-pure: false
   esbuild: true
   vue-demi: true
