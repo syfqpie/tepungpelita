@@ -40,7 +40,13 @@ export const collectionMeta = {
 		{ field: 'iso', type: 'integer', meta: { interface: 'input', width: 'half' } },
 		{ field: 'focal_length', type: 'decimal', meta: { interface: 'input', width: 'half' } },
 		{ field: 'aperture', type: 'decimal', meta: { interface: 'input', width: 'half' } },
-		{ field: 'exposure_time', type: 'decimal', meta: { interface: 'input', width: 'half' } },
+		{
+			field: 'exposure_time',
+			type: 'decimal',
+			meta: { interface: 'input', width: 'half' },
+			// Directus' default scale of 5 would round fast shutters (1/8000 s = 0.000125) to 0.00013.
+			schema: { numeric_precision: 12, numeric_scale: 8 },
+		},
 		{ field: 'gps_latitude', type: 'decimal', meta: { interface: 'input', width: 'half' } },
 		{ field: 'gps_longitude', type: 'decimal', meta: { interface: 'input', width: 'half' } },
 		{ field: 'gps_altitude', type: 'decimal', meta: { interface: 'input', width: 'half' } },
