@@ -1,0 +1,16 @@
+{
+	"name": "@tepungpelita/exif-ui-core",
+	"version": "0.0.0",
+	"private": true,
+	"description": "Frameworkless EXIF formatting helpers shared by any.",
+	"license": "MIT",
+	"type": "module",
+	"main": "src/index.ts",
+	"types": "src/index.ts",
+	"scripts": {
+		"test": "vitest run"
+	},
+	"devDependencies": {
+		"vitest": "^5.0.5"
+	}
+}

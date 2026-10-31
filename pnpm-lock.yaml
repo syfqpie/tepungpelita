@@ -200,6 +200,15 @@ importers:
       '@directus/types':
         specifier: ^18.0.0
         version: 18.0.0(knex@3.1.0(supports-color@10.2.2))(sharp@0.35.5(@types/node@26.6.5))(supports-color@10.2.2)(vue@3.5.43(typescript@6.0.3))
+      '@tepungpelita/exif-ui-core':
+        specifier: workspace:*
+        version: link:../../packages/exif-ui-core
+      vitest:
+        specifier: ^5.0.5
+        version: 5.0.5(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(vite@8.1.2(@types/node@26.6.5)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
+
+  packages/exif-ui-core:
+    devDependencies:
       vitest:
         specifier: ^5.0.5
         version: 5.0.5(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(vite@8.1.2(@types/node@26.6.5)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
