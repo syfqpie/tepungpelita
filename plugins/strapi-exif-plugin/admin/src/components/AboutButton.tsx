@@ -12,7 +12,7 @@ const AboutButton = () => (
 				<Information />
 			</IconButton>
 		</Popover.Trigger>
-		<Popover.Content side="bottom" align="end" sideOffset={8}>
+		<Popover.Content side="bottom" align="start" sideOffset={8}>
 			<Flex direction="column" alignItems="stretch" gap={3} padding={5} style={{ width: '32rem', maxWidth: '90vw' }}>
 				<div>
 					<Typography variant="delta" tag="h2">
