@@ -4,12 +4,7 @@
 
 		<template #navigation><exif-navigation /></template>
 
-		<v-info v-if="forbidden" type="danger" icon="lock" title="No access">
-			Your role needs read access to exif_metadata, directus_files and directus_folders.
-		</v-info>
-		<v-info v-else-if="error" type="danger" icon="error" title="Could not load EXIF data">{{ error }}</v-info>
-
-		<div v-else class="exif-page">
+		<div class="exif-page">
 			<div v-if="total > 0 || filtering" class="filters">
 				<v-input v-model="search" placeholder="Search camera, lens or file name">
 					<template #prepend><v-icon name="search" /></template>
@@ -17,11 +12,16 @@
 				<v-select v-model="folder" :items="folderItems" show-deselect placeholder="All folders" />
 				<div class="tail">
 					<v-button v-if="filtering" secondary @click="clearFilters">Clear filters</v-button>
-					<span class="count">{{ total }} {{ total === 1 ? 'image' : 'images' }}</span>
+					<span v-if="!forbidden && !error" class="count">{{ total }} {{ total === 1 ? 'image' : 'images' }}</span>
 				</div>
 			</div>
 
-			<v-info v-if="!loading && total === 0 && !filtering" icon="photo_camera" title="No images with EXIF data yet">
+			<!-- Shown in place of the list, never instead of the filters, so a failing filter can be cleared. -->
+			<v-info v-if="forbidden" type="danger" icon="lock" title="No access">
+				Your role can't read some of this data. It needs read access to exif_metadata, directus_files and directus_folders.
+			</v-info>
+			<v-info v-else-if="error" type="danger" icon="error" title="Could not load EXIF data">{{ error }}</v-info>
+			<v-info v-else-if="!loading && total === 0 && !filtering" icon="photo_camera" title="No images with EXIF data yet">
 				Upload JPEG images in the file library and their EXIF data appears here.
 				<template #append>
 					<v-button to="/files">Open file library</v-button>
@@ -40,7 +40,7 @@
 
 							<span class="cell file">
 								<span class="primary">{{ row.file?.name ?? row.file?.title ?? '(file removed)' }}</span>
-								<span class="secondary">{{ fileMeta(row) }}</span>
+								<span class="secondary">{{ fileMeta(row.file) }}</span>
 							</span>
 
 							<span class="cell camera">
@@ -90,7 +90,6 @@ import {
 	formatAperture,
 	formatFocalLength,
 	formatShutter,
-	formatSize,
 	formatTaken,
 	formatTakenTime,
 } from '@tepungpelita/exif-ui-core'
@@ -98,6 +97,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import ExifDrawer from './exif-drawer.vue'
 import ExifNavigation from './exif-navigation.vue'
 import { NAV } from './nav'
+import { fileMeta } from './adapter'
 import { fetchExifPage, fetchFolders, PAGE_SIZE, thumbUrl } from './api'
 import { buildFilter, hasFilters } from './filter'
 import { type Folder, folderOptions, withDescendants } from './folders'
@@ -121,18 +121,13 @@ const folderItems = computed(() => folderOptions(folders.value))
 const filtering = computed(() => hasFilters({ search: appliedSearch.value, folder: folder.value }))
 const pages = computed(() => Math.max(1, Math.ceil(total.value / PAGE_SIZE)))
 
-/** "4000 × 6000 · 8.2 MB"; Directus stores bytes, the shared formatter takes KB. */
-const fileMeta = ({ file }: ExifRow) =>
-	[file?.width && file?.height ? `${file.width} × ${file.height}` : '', formatSize(file?.size == null ? null : file.size / 1024)]
-		.filter(Boolean)
-		.join(' · ')
-
 let latest = 0
 
 const load = async () => {
 	const request = ++latest
 
 	loading.value = true
+	forbidden.value = false
 	error.value = ''
 
 	try {

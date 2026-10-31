@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { toExifRow } from './adapter'
+import { fileMeta, toExifRow } from './adapter'
 
 describe('toExifRow', () => {
 	it('coerces decimals that arrive as strings', () => {
@@ -25,5 +25,20 @@ describe('toExifRow', () => {
 
 		expect(toExifRow({ id: 'a', file })).toMatchObject({ file: { id: 'f1', name: 'a.jpg', size: 2048, folder: 'd1' } })
 		expect(toExifRow({ id: 'a', file: 'f1' }).file).toBeNull()
+	})
+})
+
+describe('fileMeta', () => {
+	const file = { id: 'f', name: 'a.jpg', title: null, type: 'image/jpeg', size: 8_589_934, width: 4000, height: 6000, folder: null }
+
+	it('turns Directus bytes into a readable size (not KB)', () => {
+		expect(fileMeta(file)).toBe('4000 × 6000 · 8.2 MB')
+		expect(fileMeta({ ...file, size: 302 * 1024 })).toBe('4000 × 6000 · 302 KB')
+	})
+
+	it('adds the type only when asked, and survives missing parts', () => {
+		expect(fileMeta(file, { type: true })).toBe('4000 × 6000 · 8.2 MB · image/jpeg')
+		expect(fileMeta({ ...file, width: null, size: null, type: null }, { type: true })).toBe('')
+		expect(fileMeta(null)).toBe('')
 	})
 })

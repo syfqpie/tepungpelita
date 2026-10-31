@@ -1,3 +1,4 @@
+import { formatSize } from '@tepungpelita/exif-ui-core'
 import type { ExifFile, ExifRow } from './types'
 
 type Num = number | string | null | undefined
@@ -72,3 +73,9 @@ export const toExifRow = (item: ExifItem): ExifRow => ({
 	raw: item.raw ?? null,
 	file: toFile(item.file),
 })
+
+/** "4000 × 6000 · 8.2 MB", plus the file type when asked. Directus stores bytes; the shared formatter takes KB. */
+export const fileMeta = (file: ExifFile | null, { type = false } = {}): string =>
+	[file?.width && file?.height ? `${file.width} × ${file.height}` : '', formatSize(file?.size == null ? null : file.size / 1024), type ? (file?.type ?? '') : '']
+		.filter(Boolean)
+		.join(' · ')

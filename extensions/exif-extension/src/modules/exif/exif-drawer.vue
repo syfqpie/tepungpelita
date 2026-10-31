@@ -12,7 +12,7 @@
 					</a>
 					<router-link class="action" :to="`/files/${row.file.id}`"><v-icon name="folder_open" small /> File library</router-link>
 				</template>
-				<button type="button" class="action" @click="download"><v-icon name="download" small /> Download JSON</button>
+				<button type="button" class="action" :disabled="rawState !== 'ready'" @click="download"><v-icon name="download" small /> Download JSON</button>
 			</div>
 
 			<dl class="strip">
@@ -54,12 +54,16 @@
 			</section>
 
 			<section>
-				<h3>All tags <span class="muted">{{ tags.length }}</span></h3>
-				<v-input v-model="query" placeholder="Filter by tag or value">
-					<template #prepend><v-icon name="search" /></template>
-				</v-input>
-				<p v-if="shown.length === 0" class="muted">{{ tags.length === 0 ? 'No tags stored.' : 'No tags match.' }}</p>
-				<dl v-else class="facts tags">
+				<h3>All tags <span v-if="rawState === 'ready'" class="muted">{{ tags.length }}</span></h3>
+				<p v-if="rawState === 'loading'" class="muted">Loading tags…</p>
+				<p v-else-if="rawState === 'failed'" class="muted">Could not load the tags. Close this drawer and open it again to retry.</p>
+				<template v-else>
+					<v-input v-model="query" placeholder="Filter by tag or value">
+						<template #prepend><v-icon name="search" /></template>
+					</v-input>
+					<p v-if="shown.length === 0" class="muted">{{ tags.length === 0 ? 'No tags stored.' : 'No tags match.' }}</p>
+				</template>
+				<dl v-if="rawState === 'ready' && shown.length > 0" class="facts tags">
 					<template v-for="[name, value] in shown" :key="name">
 						<dt>{{ name }}</dt>
 						<dd>{{ value || '–' }}</dd>
@@ -78,7 +82,6 @@ import {
 	formatFocalLength,
 	formatGps,
 	formatShutter,
-	formatSize,
 	formatTaken,
 	jsonFileName,
 	mapUrl,
@@ -86,7 +89,8 @@ import {
 	tagEntries,
 } from '@tepungpelita/exif-ui-core'
 import { computed, ref, watch } from 'vue'
-import { appUrl } from './api'
+import { fileMeta } from './adapter'
+import { appUrl, fetchRaw } from './api'
 import type { ExifRow } from './types'
 
 const props = defineProps<{ row: ExifRow }>()
@@ -94,17 +98,34 @@ const emit = defineEmits<{ close: [] }>()
 
 const api = useApi()
 const query = ref('')
+const raw = ref<Record<string, unknown> | null>(null)
+const rawState = ref<'loading' | 'ready' | 'failed'>('loading')
 
-watch(() => props.row.id, () => (query.value = ''))
+let latest = 0
 
-const meta = computed(() => {
-	const file = props.row.file
+// Every tag is large and only this drawer needs it, so it is fetched here instead of with the list.
+const loadRaw = async () => {
+	const request = ++latest
 
-	// Directus stores bytes; the shared formatter takes KB.
-	return [file?.width && file?.height ? `${file.width} × ${file.height}` : '', formatSize(file?.size == null ? null : file.size / 1024), file?.type ?? '']
-		.filter(Boolean)
-		.join(' · ')
-})
+	query.value = ''
+	raw.value = null
+	rawState.value = 'loading'
+
+	try {
+		const result = await fetchRaw(api, props.row.id)
+
+		if (request !== latest) return
+
+		raw.value = result
+		rawState.value = 'ready'
+	} catch {
+		if (request === latest) rawState.value = 'failed'
+	}
+}
+
+watch(() => props.row.id, loadRaw, { immediate: true })
+
+const meta = computed(() => fileMeta(props.row.file, { type: true }))
 
 const readout = computed(() => [
 	['Aperture', formatAperture(props.row.aperture)],
@@ -113,7 +134,7 @@ const readout = computed(() => [
 	['Focal length', formatFocalLength(props.row.focalLength)],
 ])
 
-const tags = computed(() => tagEntries(props.row.raw))
+const tags = computed(() => tagEntries(raw.value))
 
 const shown = computed(() => {
 	const needle = query.value.trim().toLowerCase()
@@ -121,7 +142,7 @@ const shown = computed(() => {
 	return needle ? tags.value.filter(([name, value]) => name.toLowerCase().includes(needle) || value.toLowerCase().includes(needle)) : tags.value
 })
 
-const download = () => saveFile(jsonFileName(props.row.file?.name), 'application/json', JSON.stringify(props.row, null, 2))
+const download = () => saveFile(jsonFileName(props.row.file?.name), 'application/json', JSON.stringify({ ...props.row, raw: raw.value }, null, 2))
 </script>
 
 <style scoped>
@@ -168,9 +189,14 @@ const download = () => saveFile(jsonFileName(props.row.file?.name), 'application
 	cursor: pointer;
 }
 
-.action:hover {
+.action:hover:not(:disabled) {
 	border-color: var(--theme--primary);
 	color: var(--theme--primary);
+}
+
+.action:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
 }
 
 .action:focus-visible,

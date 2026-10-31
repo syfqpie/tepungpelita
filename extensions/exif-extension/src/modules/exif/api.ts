@@ -5,8 +5,20 @@ import type { ExifRow } from './types'
 
 export const PAGE_SIZE = 20
 
+/** What the list shows. `raw` (every tag) is large and only the drawer needs it, so it is fetched on open. */
 const FIELDS = [
-	'*',
+	'id',
+	'camera_make',
+	'camera_model',
+	'lens_model',
+	'date_taken',
+	'iso',
+	'focal_length',
+	'aperture',
+	'exposure_time',
+	'gps_latitude',
+	'gps_longitude',
+	'gps_altitude',
 	'file.id',
 	'file.filename_download',
 	'file.title',
@@ -23,6 +35,12 @@ export const fetchExifPage = async (api: ReturnType<typeof useApi>, page: number
 	})
 
 	return { rows: (data.data as ExifItem[]).map(toExifRow), total: Number(data.meta?.filter_count ?? 0) }
+}
+
+export const fetchRaw = async (api: ReturnType<typeof useApi>, id: string): Promise<Record<string, unknown> | null> => {
+	const { data } = await api.get(`/items/exif_metadata/${id}`, { params: { fields: 'raw' } })
+
+	return data.data?.raw ?? null
 }
 
 export const fetchFolders = async (api: ReturnType<typeof useApi>): Promise<Folder[]> => {
