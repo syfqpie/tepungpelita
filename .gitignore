@@ -22,3 +22,5 @@ dev/strapi/.tmp
 dev/strapi/.strapi
 dev/strapi/.cache
 dev/strapi/build
+
+.tepung
